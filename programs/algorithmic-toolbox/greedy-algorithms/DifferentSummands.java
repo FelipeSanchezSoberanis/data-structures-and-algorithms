@@ -1,42 +1,33 @@
-import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
 
 public class DifferentSummands {
+    private static List<Integer> getUniqueSummands(int n) {
+        List<Integer> summands = new LinkedList<>();
 
-    private static int[] getUniqueSummands(int n) {
-        if (n == 1 || n == 2) {
-            int[] summands = {n};
-            return summands;
-        }
+        int i = 1;
+        int sum = 0;
 
-        int maxNumberSummands = n / 2 + 1;
+        while (sum < n) {
+            if ((sum + i) > n) {
+                summands.add(n - sum);
 
-        int[] summands = new int[n];
-        summands[0] = 1;
-
-        int sum = 1;
-
-        for (int i = 1; i < maxNumberSummands; i++) {
-            int nextNumber = i + 1;
-
-            if (sum + nextNumber > n) {
-                summands[i] = n - sum;
-
-                if (summands[i] <= summands[i - 1]) {
-                    summands[i - 1] += summands[i];
-                    summands[i] = 0;
+                int lastSummand = summands.get(summands.size() - 1);
+                int secondToLastSummand = summands.get(summands.size() - 2);
+                if (lastSummand <= secondToLastSummand) {
+                    summands.set(summands.size() - 2, lastSummand + secondToLastSummand);
+                    summands.remove(summands.size() - 1);
                 }
-
-                return Arrays.stream(summands).filter(s -> s != 0).toArray();
+            } else {
+                summands.add(i);
             }
 
-            summands[i] = nextNumber;
-            sum += nextNumber;
-
-            if (sum == n) return Arrays.stream(summands).filter(s -> s != 0).toArray();
+            sum += i;
+            i++;
         }
 
-        return Arrays.stream(summands).filter(s -> s != 0).toArray();
+        return summands;
     }
 
     public static void main(String[] args) {
@@ -46,9 +37,9 @@ public class DifferentSummands {
 
         scanner.close();
 
-        int[] summands = getUniqueSummands(n);
+        List<Integer> summands = getUniqueSummands(n);
 
-        System.out.println(summands.length);
-        Arrays.stream(summands).forEach(s -> System.out.format("%s ", s));
+        System.out.println(summands.size());
+        summands.forEach(s -> System.out.format("%s ", s));
     }
 }
