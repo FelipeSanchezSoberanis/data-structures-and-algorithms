@@ -2,20 +2,26 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Inversions {
+    private static int noInversions = 0;
+
     private static int[] merge(int[] array1, int[] array2) {
         int[] mergedArray = new int[array1.length + array2.length];
 
-        int counter = 0;
-        while (array1.length > 0 && array2.length > 0) {
-            int numberFromArray1 = array1[0];
-            int numberFromArray2 = array2[0];
+        int array1OriginalLength = array1.length;
 
-            if (numberFromArray1 <= numberFromArray2) {
-                mergedArray[counter] = numberFromArray1;
-                array1 = Arrays.stream(array1).filter(n -> n != numberFromArray1).toArray();
+        int counter = 0;
+        int inversionCounterAdjustment = 0;
+        while (array1.length > 0 && array2.length > 0) {
+            if (array1[0] <= array2[0]) {
+                mergedArray[counter] = array1[0];
+                array1 = Arrays.copyOfRange(array1, 1, array1.length);
+
+                inversionCounterAdjustment++;
             } else {
-                mergedArray[counter] = numberFromArray2;
-                array2 = Arrays.stream(array2).filter(n -> n != numberFromArray2).toArray();
+                mergedArray[counter] = array2[0];
+                array2 = Arrays.copyOfRange(array2, 1, array2.length);
+
+                noInversions += array1OriginalLength - inversionCounterAdjustment;
             }
 
             counter++;
@@ -39,13 +45,11 @@ public class Inversions {
 
         int m = Math.floorDiv(numbers.length, 2);
 
-        int[] B = mergeSort(Arrays.copyOfRange(numbers, 0, m));
+        int[] b = mergeSort(Arrays.copyOfRange(numbers, 0, m));
+        int[] c = mergeSort(Arrays.copyOfRange(numbers, m, numbers.length));
+        int[] a = merge(b, c);
 
-        int[] C = mergeSort(Arrays.copyOfRange(numbers, m, numbers.length));
-
-        int[] A = merge(B, C);
-
-        return A;
+        return a;
     }
 
     public static void main(String[] args) {
@@ -60,6 +64,8 @@ public class Inversions {
 
         scanner.close();
 
-        Arrays.stream(mergeSort(numbers)).forEach(n -> System.out.format("%s, ", n));
+        mergeSort(numbers);
+
+        System.out.println(noInversions);
     }
 }
