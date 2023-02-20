@@ -36,32 +36,32 @@ public class LCS2 {
             int[][] D,
             int i,
             int j,
-            StringBuilder alignedString1,
-            StringBuilder alignedString2) {
+            StringBuilder alignedStringBuilder1,
+            StringBuilder alignedStringBuilder2) {
         if (i == 0 && j == 0) return;
 
         if (i > 0 && D[i][j] == D[i - 1][j] + 1) {
-            outputAlignment(A, B, D, i - 1, j, alignedString1, alignedString2);
+            outputAlignment(A, B, D, i - 1, j, alignedStringBuilder1, alignedStringBuilder2);
 
-            alignedString1.append(A[i - 1]);
-            alignedString2.append("-");
+            alignedStringBuilder1.append(A[i - 1]);
+            alignedStringBuilder2.append("-");
 
         } else if (j > 0 && D[i][j] == D[i][j - 1] + 1) {
-            outputAlignment(A, B, D, i, j - 1, alignedString1, alignedString2);
+            outputAlignment(A, B, D, i, j - 1, alignedStringBuilder1, alignedStringBuilder2);
 
-            alignedString1.append("-");
-            alignedString2.append(B[j - 1]);
+            alignedStringBuilder1.append("-");
+            alignedStringBuilder2.append(B[j - 1]);
         } else {
-            outputAlignment(A, B, D, i - 1, j - 1, alignedString1, alignedString2);
+            outputAlignment(A, B, D, i - 1, j - 1, alignedStringBuilder1, alignedStringBuilder2);
 
-            alignedString1.append(A[i - 1]);
-            alignedString2.append(B[j - 1]);
+            alignedStringBuilder1.append(A[i - 1]);
+            alignedStringBuilder2.append(B[j - 1]);
         }
 
         LOGGER.info(
                 String.format(
                         "String1: %s    String2: %s",
-                        alignedString1.toString(), alignedString2.toString()));
+                        alignedStringBuilder1.toString(), alignedStringBuilder2.toString()));
     }
 
     private static int[][] editDistanceMatrix(String string1, String string2) {
