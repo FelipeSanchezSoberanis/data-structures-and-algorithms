@@ -7,6 +7,14 @@ public class LCS2 {
     private static final Logger LOGGER = Logger.getLogger(LCS2.class.getName());
     private static final Level LOGGER_LEVEL = Level.INFO;
 
+    private static int getNoAlignedChars(String alignedString1, String alignedString2) {
+        int result = 0;
+        for (int i = 0; i < alignedString1.length(); i++) {
+            if (alignedString1.charAt(i) == alignedString2.charAt(i)) result++;
+        }
+        return result;
+    }
+
     private static String[] getAlignmentFromMatrix(
             int[][] distanceMatrix, String string1, String string2) {
         char[] A = string1.toCharArray();
@@ -153,13 +161,5 @@ public class LCS2 {
             System.out.print("=====\nResult: ");
         }
         System.out.println(result);
-    }
-
-    private static int getNoAlignedChars(String alignedString1, String alignedString2) {
-        int result = 0;
-        for (int i = 0; i < alignedString1.length(); i++) {
-            if (alignedString1.charAt(i) == alignedString2.charAt(i)) result++;
-        }
-        return result;
     }
 }
