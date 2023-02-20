@@ -1,27 +1,27 @@
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class LCS2 {
     private static final Logger LOGGER = Logger.getLogger(LCS2.class.getName());
-    private static final Level LOGGER_LEVEL = Level.INFO;
+    private static final Level LOGGER_LEVEL = Level.OFF;
 
-    private static int getNoAlignedChars(String alignedString1, String alignedString2) {
+    private static int getNoAlignedNumbers(
+            List<String> alignedString1, List<String> alignedString2) {
         int result = 0;
-        for (int i = 0; i < alignedString1.length(); i++) {
-            if (alignedString1.charAt(i) == alignedString2.charAt(i)) result++;
+        for (int i = 0; i < alignedString1.size(); i++) {
+            if (alignedString1.get(i).equals(alignedString2.get(i))) result++;
         }
         return result;
     }
 
-    private static String[] getAlignmentFromMatrix(
-            int[][] distanceMatrix, String string1, String string2) {
-        char[] A = string1.toCharArray();
-        char[] B = string2.toCharArray();
-
-        StringBuilder alignedStringBuilder1 = new StringBuilder();
-        StringBuilder alignedStringBuilder2 = new StringBuilder();
+    private static List<List<String>> getAlignmentFromMatrix(
+            int[][] distanceMatrix, int[] A, int[] B) {
+        List<String> alignedString1 = new ArrayList<String>();
+        List<String> alignedString2 = new ArrayList<String>();
 
         outputAlignment(
                 A,
@@ -29,53 +29,50 @@ public class LCS2 {
                 distanceMatrix,
                 distanceMatrix.length - 1,
                 distanceMatrix[distanceMatrix.length - 1].length - 1,
-                alignedStringBuilder1,
-                alignedStringBuilder2);
+                alignedString1,
+                alignedString2);
 
-        String[] alignedStrings = {
-            alignedStringBuilder1.toString(), alignedStringBuilder2.toString()
-        };
+        List<List<String>> alignedStrings = new ArrayList<>();
+        alignedStrings.add(alignedString1);
+        alignedStrings.add(alignedString2);
         return alignedStrings;
     }
 
     private static void outputAlignment(
-            char[] A,
-            char[] B,
+            int[] A,
+            int[] B,
             int[][] D,
             int i,
             int j,
-            StringBuilder alignedStringBuilder1,
-            StringBuilder alignedStringBuilder2) {
+            List<String> alignedString1,
+            List<String> alignedString2) {
         if (i == 0 && j == 0) return;
 
         if (i > 0 && D[i][j] == D[i - 1][j] + 1) {
-            outputAlignment(A, B, D, i - 1, j, alignedStringBuilder1, alignedStringBuilder2);
+            outputAlignment(A, B, D, i - 1, j, alignedString1, alignedString2);
 
-            alignedStringBuilder1.append(A[i - 1]);
-            alignedStringBuilder2.append("-");
+            alignedString1.add(Integer.toString(A[i - 1]));
+            alignedString2.add("-");
 
         } else if (j > 0 && D[i][j] == D[i][j - 1] + 1) {
-            outputAlignment(A, B, D, i, j - 1, alignedStringBuilder1, alignedStringBuilder2);
+            outputAlignment(A, B, D, i, j - 1, alignedString1, alignedString2);
 
-            alignedStringBuilder1.append("-");
-            alignedStringBuilder2.append(B[j - 1]);
+            alignedString1.add("-");
+            alignedString2.add(Integer.toString(B[j - 1]));
         } else {
-            outputAlignment(A, B, D, i - 1, j - 1, alignedStringBuilder1, alignedStringBuilder2);
+            outputAlignment(A, B, D, i - 1, j - 1, alignedString1, alignedString2);
 
-            alignedStringBuilder1.append(A[i - 1]);
-            alignedStringBuilder2.append(B[j - 1]);
+            alignedString1.add(Integer.toString(A[i - 1]));
+            alignedString2.add(Integer.toString(B[j - 1]));
         }
 
         LOGGER.info(
                 String.format(
                         "String1: %s    String2: %s",
-                        alignedStringBuilder1.toString(), alignedStringBuilder2.toString()));
+                        alignedString1.toString(), alignedString2.toString()));
     }
 
-    private static int[][] editDistanceMatrix(String string1, String string2) {
-        char[] A = string1.toCharArray();
-        char[] B = string2.toCharArray();
-
+    private static int[][] editDistanceMatrix(int[] A, int[] B) {
         int ALength = A.length + 1;
         int BLength = B.length + 1;
 
@@ -133,25 +130,35 @@ public class LCS2 {
 
         Scanner scanner = new Scanner(System.in);
 
-        String string1 = scanner.nextLine();
-        String string2 = scanner.nextLine();
+        int m = scanner.nextInt();
+        int[] numberArray1 = new int[m];
+        for (int i = 0; i < m; i++) {
+            numberArray1[i] = scanner.nextInt();
+        }
+
+        int n = scanner.nextInt();
+        int[] numberArray2 = new int[n];
+        for (int i = 0; i < n; i++) {
+            numberArray2[i] = scanner.nextInt();
+        }
 
         scanner.close();
 
-        int[][] distanceMatrix = editDistanceMatrix(string1, string2);
-        String[] alignedStrings = getAlignmentFromMatrix(distanceMatrix, string1, string2);
-        String alignedString1 = alignedStrings[0];
-        String alignedString2 = alignedStrings[1];
-        int result = getNoAlignedChars(alignedString1, alignedString2);
+        int[][] distanceMatrix = editDistanceMatrix(numberArray1, numberArray2);
+        List<List<String>> alignedStrings =
+                getAlignmentFromMatrix(distanceMatrix, numberArray1, numberArray2);
+        List<String> alignedString1 = alignedStrings.get(0);
+        List<String> alignedString2 = alignedStrings.get(1);
+        int result = getNoAlignedNumbers(alignedString1, alignedString2);
 
         if (LOGGER_LEVEL.equals(Level.INFO)) {
             System.out.println("=====");
             System.out.println("Aligned words:");
-            for (char c : alignedString1.toCharArray()) {
+            for (String c : alignedString1) {
                 System.out.format("%s ", c);
             }
             System.out.println();
-            for (char c : alignedString2.toCharArray()) {
+            for (String c : alignedString2) {
                 System.out.format("%s ", c);
             }
             System.out.println();
