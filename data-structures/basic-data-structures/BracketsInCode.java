@@ -1,7 +1,35 @@
 import java.util.Scanner;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class BracketsInCode {
+    private static final Logger LOGGER = Logger.getLogger(BracketsInCode.class.getName());
+    private static final Level LOGGER_LEVEL = Level.OFF;
+
+    private static class CharacterWithPosition {
+        private int index;
+        private Character character;
+
+        public CharacterWithPosition(int index, Character character) {
+            this.index = index;
+            this.character = character;
+        }
+
+        public int getIndex() {
+            return index;
+        }
+
+        public Character getCharacter() {
+            return character;
+        }
+
+        @Override
+        public String toString() {
+            return "CharacterWithPosition [character=" + character + ", index=" + index + "]";
+        }
+    }
+
     private static class Result {
         private int index;
         private boolean isBalanced;
@@ -21,39 +49,53 @@ public class BracketsInCode {
     }
 
     private static Result isBalanced(String str) {
-        Stack<Character> stack = new Stack<>();
+        Stack<CharacterWithPosition> stack = new Stack<>();
         char[] strArray = str.toCharArray();
 
         for (int i = 0; i < strArray.length; i++) {
-            Character _char = strArray[i];
+            CharacterWithPosition currentCharWithPosition =
+                    new CharacterWithPosition(i, strArray[i]);
 
-            if (_char.equals('(') || _char.equals('[') || _char.equals('{')) {
-                stack.push(_char);
-            } else {
-                if (stack.empty()) return new Result(i, false);
+            Character currentChar = currentCharWithPosition.getCharacter();
+            if (currentChar.equals('(') || currentChar.equals('[') || currentChar.equals('{')) {
+                stack.push(currentCharWithPosition);
+            } else if (currentChar.equals(')')
+                    || currentChar.equals(']')
+                    || currentChar.equals('}')) {
+                if (stack.isEmpty()) return new Result(i, false);
 
-                Character top = stack.pop();
+                CharacterWithPosition topCharWithPosition = stack.pop();
+                Character topChar = topCharWithPosition.getCharacter();
 
-                if ((top.equals('[') && !_char.equals(']'))
-                        || (top.equals('(') && !_char.equals(')'))
-                        || (top.equals('{') && !_char.equals('}'))) {
-
+                if ((currentChar.equals(')') && !topChar.equals('('))
+                        || (currentChar.equals(']') && !topChar.equals('['))
+                        || (currentChar.equals('}') && !topChar.equals('{'))) {
                     return new Result(i, false);
                 }
             }
+
+            LOGGER.info(String.format("Index: %s", i));
+            LOGGER.info(String.format("Current character: %s", currentCharWithPosition));
+            LOGGER.info(String.format("Stack: %s", stack.toString()));
         }
 
-        return new Result(0, stack.isEmpty());
+        return new Result(stack.isEmpty() ? 0 : stack.peek().getIndex(), stack.isEmpty());
     }
 
     public static void main(String[] args) {
+        LOGGER.setLevel(LOGGER_LEVEL);
+
         Scanner scanner = new Scanner(System.in);
 
         String input = scanner.nextLine();
 
         scanner.close();
 
+        Long start = System.currentTimeMillis();
         Result result = isBalanced(input);
+        Long end = System.currentTimeMillis();
+
+        LOGGER.info(String.format("Time: %s ms", (end - start)));
 
         System.out.println(result.isBalanced() ? "Success" : result.getIndex() + 1);
     }
