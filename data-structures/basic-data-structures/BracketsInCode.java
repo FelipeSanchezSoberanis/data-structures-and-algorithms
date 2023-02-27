@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Stack;
 import java.util.logging.Level;
@@ -6,6 +8,39 @@ import java.util.logging.Logger;
 public class BracketsInCode {
     private static final Logger LOGGER = Logger.getLogger(BracketsInCode.class.getName());
     private static final Level LOGGER_LEVEL = Level.OFF;
+
+    private static class SimpleStack<T> extends Stack<T> {
+        private List<T> items;
+        private int counter;
+
+        public SimpleStack(int itemsSize) {
+            this.items = new ArrayList<>(itemsSize);
+            this.counter = 0;
+        }
+
+        @Override
+        public T push(T item) {
+            items.add(counter, item);
+            counter++;
+            return item;
+        }
+
+        @Override
+        public synchronized T pop() {
+            counter--;
+            return items.remove(counter);
+        }
+
+        @Override
+        public synchronized boolean isEmpty() {
+            return items.isEmpty();
+        }
+
+        @Override
+        public synchronized T peek() {
+            return items.get(counter - 1);
+        }
+    }
 
     private static class CharacterWithPosition {
         private int index;
@@ -49,7 +84,7 @@ public class BracketsInCode {
     }
 
     private static Result isBalanced(String str) {
-        Stack<CharacterWithPosition> stack = new Stack<>();
+        SimpleStack<CharacterWithPosition> stack = new SimpleStack<>(str.length());
         char[] strArray = str.toCharArray();
 
         for (int i = 0; i < strArray.length; i++) {
