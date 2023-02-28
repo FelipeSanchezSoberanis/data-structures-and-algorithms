@@ -1,5 +1,8 @@
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -9,71 +12,70 @@ public class TreeHeight {
     private static final Logger LOGGER = Logger.getLogger(TreeHeight.class.getName());
     private static final Level LOGGER_LEVEL = Level.INFO;
 
-    public static class Node {
+    private static class Node {
         private int value;
-        private int parentValue;
-        private List<Node> children;
 
-        public Node(int value, int parentValue) {
+        public Node(int value) {
             this.value = value;
-            this.parentValue = parentValue;
-        }
-
-        public int getParentValue() {
-            return parentValue;
-        }
-
-        public void setParentValue(int parentValue) {
-            this.parentValue = parentValue;
         }
 
         public int getValue() {
             return value;
         }
 
-        public void setValue(int value) {
-            this.value = value;
+        @Override
+        public String toString() {
+            return "Node [value=" + value + "]";
+        }
+    }
+
+    private static class Tree {
+        private Map<Integer, List<Node>> nodes;
+
+        public Tree(int[] nodeParentValues) {
+            nodes = new HashMap<>();
+
+            for (int i = 0; i < nodeParentValues.length; i++) {
+                Node node = new Node(i);
+                int nodeParentValue = nodeParentValues[i];
+
+                List<Node> childrenNodes =
+                        nodes.containsKey(nodeParentValue)
+                                ? nodes.get(nodeParentValue)
+                                : new ArrayList<>();
+                childrenNodes.add(node);
+
+                nodes.put(nodeParentValue, childrenNodes);
+
+                LOGGER.info(String.format("Creating tree. Working on node: %s", node.toString()));
+            }
         }
 
-        public List<Node> getChildren() {
-            return children;
-        }
-
-        public void setChildren(List<Node> children) {
-            this.children = children;
-        }
-
-        public void addChild(Node node) {
-            this.children.add(node);
+        private Node getRootNode() {
+            return nodes.get(-1).get(0);
         }
 
         @Override
         public String toString() {
-            return "{children:"
-                    + children
-                    + ", parentValue:"
-                    + parentValue
-                    + ", value:"
-                    + value
-                    + "}";
-        }
-    }
-
-    private static Node createTree(int[] nodeInts) {
-        List<Node> nodes = new ArrayList<>();
-
-        for (int i = 0; i < nodeInts.length; i++) {
-            nodes.add(new Node(i, nodeInts[i]));
+            return "Tree [nodes=" + nodes + "]";
         }
 
-        for (Node node : nodes) {
-            node.setChildren(
-                    nodes.stream()
-                            .filter(n -> n.getParentValue() == node.getValue())
-                            .collect(Collectors.toList()));
-        }
+        public int getHeight(Node node) {
+            if (!nodes.containsKey(node.getValue())) {
+                LOGGER.info(String.format("Node %s has no children", node.toString()));
+                return 1;
+            }
 
-        return nodes.stream().filter(n -> n.getParentValue() == -1).findFirst().get();
+            List<Node> childrenNodes = nodes.get(node.getValue());
+            List<Integer> childrenNodesHeights =
+                    childrenNodes.stream().map(n -> getHeight(n)).collect(Collectors.toList());
+
+            LOGGER.info(
+                    String.format(
+                            "Node %s has %s children", node.toString(), childrenNodes.size()));
+
+            return 1 + Collections.max(childrenNodesHeights);
+        }
     }
 
     public static void main(String[] args) {
@@ -90,8 +92,13 @@ public class TreeHeight {
 
         scanner.close();
 
-        Node nodeTree = createTree(nodes);
+        Tree tree = new Tree(nodes);
+        Node rootNode = tree.getRootNode();
+        int treeHeight = tree.getHeight(rootNode);
 
-        LOGGER.info(String.format("Tree: %s", nodeTree));
+        LOGGER.info(String.format("Tree: %s", tree.toString()));
+        LOGGER.info(String.format("Tree height: %s", treeHeight));
+
+        System.out.println(treeHeight);
     }
 }
