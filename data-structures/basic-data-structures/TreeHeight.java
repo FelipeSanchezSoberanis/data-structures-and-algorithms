@@ -1,16 +1,16 @@
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class TreeHeight {
     private static final Logger LOGGER = Logger.getLogger(TreeHeight.class.getName());
-    private static final Level LOGGER_LEVEL = Level.INFO;
+    private static final Level LOGGER_LEVEL = Level.OFF;
 
     private static class Node {
         private int value;
@@ -52,6 +52,7 @@ public class TreeHeight {
         }
 
         private Node getRootNode() {
+            LOGGER.info("Getting root node");
             return nodes.get(-1).get(0);
         }
 
@@ -61,20 +62,33 @@ public class TreeHeight {
         }
 
         public int getHeight(Node node) {
+            LOGGER.info(String.format("Calculating height for node: %s", node.toString()));
+
             if (!nodes.containsKey(node.getValue())) {
                 LOGGER.info(String.format("Node %s has no children", node.toString()));
                 return 1;
             }
 
-            List<Node> childrenNodes = nodes.get(node.getValue());
-            List<Integer> childrenNodesHeights =
-                    childrenNodes.stream().map(n -> getHeight(n)).collect(Collectors.toList());
+            Queue<Node> queue = new LinkedList<>();
 
-            LOGGER.info(
-                    String.format(
-                            "Node %s has %s children", node.toString(), childrenNodes.size()));
+            queue.add(node);
+            int height = 0;
 
-            return 1 + Collections.max(childrenNodesHeights);
+            while (true) {
+                int nodeCount = queue.size();
+                if (nodeCount == 0) return height;
+                height++;
+
+                while (nodeCount > 0) {
+                    Node newNode = queue.peek();
+                    queue.remove();
+
+                    if (nodes.containsKey(newNode.getValue())) {
+                        queue.addAll(nodes.get(newNode.getValue()));
+                    }
+                    nodeCount--;
+                }
+            }
         }
     }
 
