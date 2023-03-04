@@ -14,6 +14,7 @@
     * [Trees](#trees)
         * [Walking a tree](#walking-a-tree)
     * [Dynamic arrays](#dynamic-arrays)
+    * [Priority Queues](#priority-queues)
 
 <!-- vim-markdown-toc -->
 
@@ -154,4 +155,27 @@ To implement, you have to store:
 - arr: dynamically-allocated array
 - capacity: size of the dynamically-allocated array
 - size: number of elements currently in the array
+
+## Priority Queues
+
+Is an abstract data type supporting the following main operations:
+- PushBack(e): adds an element to the back of the queue
+- PopFront(): extracts an element from the front of the queue
+- Remove(it): removes an element popinted by an iterator it
+- GetMax(): returns an element with maximum priority, without changing the set of elements
+- ChangePriority(it, p): changes the priority of an element pointed by it to p
+
+A priority queue is a generalization of a queue where each element is assigned a priority and elements come out in order of priority.
+
+Typical use case:
+- Scheduling jobs:
+    - Want to process jobs one by one in order of decreasing priority. While the current job is processed, new jobs may arrive
+    - To add a job to the set of scheduled jobs, call Insert(job)
+    - To process a job with the highest priority, get it by calling ExtractMax()
+
+Algoriths that use priority queues:
+- Dijsktra's algorith: finding a shortes path in a graph
+- Prim's algorithm: constructing a minimum spanning tree of graph
+- Huffman's algorithm: constructing an optimum prefix-fee enconding of a string
+- Heap sort: sorting a given sequence
 
