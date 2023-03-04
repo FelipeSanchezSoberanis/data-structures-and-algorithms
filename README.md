@@ -13,6 +13,7 @@
     * [Queues](#queues)
     * [Trees](#trees)
         * [Walking a tree](#walking-a-tree)
+    * [Dynamic arrays](#dynamic-arrays)
 
 <!-- vim-markdown-toc -->
 
@@ -134,5 +135,23 @@ For example, print the nodes of the tree.
 - Depth first: we completely traverse one sub-tree before exploring a sibling sub-tree
 - Breadth-first: we traverse all nodes at one level before progressing to the next level
 
+## Dynamic arrays
 
+Problem: might not know max size when allocating an array.
+
+Solution: dynamic arrays (also known as resizable arrays).
+
+Idea: store a pointer to a dinamically allocated array, and replace it with a newly-allocated array as needed.
+
+It is an abstract data type with the following operations (at least):
+- Get(i): return element at location i
+- Set(i, val): sets element i to val
+- PushBack(val): adds val to the end
+- Remove(i): removes element at location i
+- Size(): return the number of elements
+
+To implement, you have to store:
+- arr: dynamically-allocated array
+- capacity: size of the dynamically-allocated array
+- size: number of elements currently in the array
 
