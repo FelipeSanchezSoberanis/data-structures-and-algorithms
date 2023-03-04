@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
@@ -43,6 +44,6 @@ public class MakeHeap {
 
         scanner.close();
 
-        LOGGER.info("Testing");
+        LOGGER.info(String.format("Numbers: %s", Arrays.toString(numbers)));
     }
 }
