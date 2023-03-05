@@ -34,6 +34,12 @@ public class MakeHeap {
 
         LOGGER.info("=== After sorting ===");
         LOGGER.info(String.format("Binary tree items: %s", binaryTree.toString()));
+
+        List<Swap> swaps = binaryTree.getSwaps();
+
+        System.out.println(swaps.size());
+        swaps.forEach(
+                s -> System.out.format("%s %s \n", s.getFirstPosition(), s.getSecondPosition()));
     }
 }
 
@@ -41,12 +47,19 @@ class CompleteBinaryTree {
     private static Logger LOGGER;
 
     private List<Integer> items;
+    private List<Swap> swaps;
 
     public CompleteBinaryTree(List<Integer> items) {
         LOGGER = new MyLogger(CompleteBinaryTree.class).getLogger();
 
         this.items = new ArrayList<>(items.size());
         this.items = items;
+
+        this.swaps = new ArrayList<>();
+    }
+
+    public List<Swap> getSwaps() {
+        return swaps;
     }
 
     public void sort() {
@@ -100,6 +113,8 @@ class CompleteBinaryTree {
         items.set(i, items.get(j));
         items.set(j, swap);
 
+        swaps.add(new Swap(i, j));
+
         LOGGER.info(
                 String.format(
                         "item[%s] and item[%s] after swapping: %s, %s", i, j, get(i), get(j)));
@@ -137,13 +152,13 @@ class CompleteBinaryTree {
         return Optional.of(items.get(rightIndex));
     }
 
-    private Optional<Integer> getParent(int i) {
-        int parentIndex = Math.floorDiv(i - 1, 2);
+    // private Optional<Integer> getParent(int i) {
+    //     int parentIndex = Math.floorDiv(i - 1, 2);
 
-        if (!isValidIndex(parentIndex)) return Optional.empty();
+    //     if (!isValidIndex(parentIndex)) return Optional.empty();
 
-        return Optional.of(items.get(parentIndex));
-    }
+    //     return Optional.of(items.get(parentIndex));
+    // }
 
     @Override
     public String toString() {
@@ -151,9 +166,35 @@ class CompleteBinaryTree {
     }
 }
 
+class Swap {
+    private Integer firstPosition;
+    private Integer secondPosition;
+
+    public Swap(Integer firstPosition, Integer secondPosition) {
+        this.firstPosition = firstPosition;
+        this.secondPosition = secondPosition;
+    }
+
+    public Integer getFirstPosition() {
+        return firstPosition;
+    }
+
+    public void setFirstPosition(Integer firstPosition) {
+        this.firstPosition = firstPosition;
+    }
+
+    public Integer getSecondPosition() {
+        return secondPosition;
+    }
+
+    public void setSecondPosition(Integer secondPosition) {
+        this.secondPosition = secondPosition;
+    }
+}
+
 class MyLogger {
     private static Logger LOGGER;
-    private static Level LOGGER_LEVEL = Level.INFO;
+    private static Level LOGGER_LEVEL = Level.OFF;
 
     private static void configureLogger(Logger logger) {
         logger.setLevel(LOGGER_LEVEL);
