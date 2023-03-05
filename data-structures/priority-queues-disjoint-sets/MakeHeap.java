@@ -1,6 +1,6 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.Scanner;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
@@ -17,189 +17,188 @@ public class MakeHeap {
         Scanner scanner = new Scanner(System.in);
 
         int noNumbers = scanner.nextInt();
-        List<Integer> numbers = new ArrayList<>(noNumbers);
+        int[] numbers = new int[noNumbers];
 
-        for (int i = 0; i < noNumbers; i++) {
-            numbers.add(scanner.nextInt());
+        for (int i = noNumbers - 1; i >= 0; i--) {
+            numbers[i] = scanner.nextInt();
         }
 
         scanner.close();
 
-        CompleteBinaryTree binaryTree = new CompleteBinaryTree(numbers);
+        CompleteBinaryTree tree = new CompleteBinaryTree(numbers);
 
-        LOGGER.info("=== Before sorting ===");
-        LOGGER.info(String.format("Binary tree items: %s", binaryTree.toString()));
-
-        binaryTree.sort();
-
-        LOGGER.info("=== After sorting ===");
-        LOGGER.info(String.format("Binary tree items: %s", binaryTree.toString()));
-
-        List<Swap> swaps = binaryTree.getSwaps();
-
+        List<Swap> swaps = tree.getSwaps();
         System.out.println(swaps.size());
-        swaps.forEach(
-                s -> System.out.format("%s %s \n", s.getFirstPosition(), s.getSecondPosition()));
+        swaps.forEach(s -> System.out.format("%s %s \n", s.getFirstNumber(), s.getSecondNumber()));
+
+        LOGGER.info("=== General data ===");
+        LOGGER.info(String.format("Numbers array, as inputed: %s", Arrays.toString(numbers)));
+        LOGGER.info(String.format("Created heap: %s", tree.toString()));
+        LOGGER.info(String.format("Valid heap? %s", tree.checkIfHeap()));
     }
 }
 
 class CompleteBinaryTree {
     private static Logger LOGGER;
 
-    private List<Integer> items;
+    private int[] nodes;
+    private int size;
     private List<Swap> swaps;
 
-    public CompleteBinaryTree(List<Integer> items) {
+    public CompleteBinaryTree(int[] nodes) {
         LOGGER = new MyLogger(CompleteBinaryTree.class).getLogger();
 
-        this.items = new ArrayList<>(items.size());
-        this.items = items;
-
+        this.nodes = nodes;
+        this.size = nodes.length;
         this.swaps = new ArrayList<>();
+
+        buildHeap();
     }
 
-    public List<Swap> getSwaps() {
-        return swaps;
+    public boolean checkIfHeap() {
+        for (int i = 0; i < size; i++) {
+            int leftChildIndex = getLeftChildIndex(i);
+            int rightChildIndex = getRightChildIndex(i);
+
+            if (leftChildIndex < size && get(leftChildIndex) > get(i)) {
+                return false;
+            }
+
+            if (rightChildIndex < size && get(rightChildIndex) > get(i)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public void sort() {
-        for (int i = items.size() / 2 - 1; i >= 0; i--) {
-            heapify(items.size(), i);
-        }
-
-        for (int i = items.size() - 1; i > 0; i--) {
-            swap(0, i);
-            heapify(i, 0);
+        int originalSize = size;
+        for (int i = 0; i < originalSize - 1; i++) {
+            swapNodes(0, size - 1);
+            size--;
+            siftDown(0);
         }
     }
 
-    private void heapify(int heapSize, int rootValueIndex) {
-        LOGGER.info("=== heapify ===");
-
-        int largestValueIndex = rootValueIndex;
-
-        if (getLeftIndex(rootValueIndex) < heapSize
-                && getLeft(rootValueIndex).get() > get(largestValueIndex)) {
-            largestValueIndex = getLeftIndex(rootValueIndex);
-        }
-
-        if (getRightIndex(rootValueIndex) < heapSize
-                && getRight(rootValueIndex).get() > get(largestValueIndex)) {
-            largestValueIndex = getRightIndex(rootValueIndex);
-        }
-
-        LOGGER.info(String.format("Root value index: %s", rootValueIndex));
-        LOGGER.info(String.format("Root value: %s", get(rootValueIndex)));
-        LOGGER.info(String.format("Left value: %s", getLeft(rootValueIndex)));
-        LOGGER.info(String.format("Right value: %s", getRight(rootValueIndex)));
-        LOGGER.info(String.format("Largest value of the two: %s", get(largestValueIndex)));
-        LOGGER.info(String.format("Largest value index: %s", largestValueIndex));
-
-        if (rootValueIndex != largestValueIndex) {
-            swap(rootValueIndex, largestValueIndex);
-
-            heapify(heapSize, largestValueIndex);
+    public void buildHeap() {
+        for (int i = Math.floorDiv(size, 2) - 1; i >= 0; i--) {
+            siftDown(i);
         }
     }
 
-    private void swap(int i, int j) {
-        LOGGER.info(String.format("=== Swapping ==="));
+    public int remove(int i) {
+        int value = get(i);
+        set(i, Integer.MAX_VALUE);
+        siftUp(i);
+        extractMax();
+        return value;
+    }
 
-        LOGGER.info(
-                String.format(
-                        "item[%s] and item[%s] before swapping: %s, %s", i, j, get(i), get(j)));
+    public int extractMax() {
+        int result = get(0);
+        set(0, get(size - 1));
+        size--;
+        siftDown(0);
+        return result;
+    }
 
-        Integer swap = items.get(i);
-        items.set(i, items.get(j));
-        items.set(j, swap);
+    public void siftDown(int i) {
+        int maxIndex = i;
+        int leftChildIndex = getLeftChildIndex(i);
+        int rightChildIndex = getRightChildIndex(i);
+
+        if (leftChildIndex < size && get(leftChildIndex) > get(maxIndex)) {
+            maxIndex = leftChildIndex;
+        }
+
+        if (rightChildIndex < size && get(rightChildIndex) > get(maxIndex)) {
+            maxIndex = rightChildIndex;
+        }
+
+        if (i != maxIndex) {
+            swapNodes(i, maxIndex);
+            siftDown(maxIndex);
+        }
+    }
+
+    public void siftUp(int i) {
+        int parentIndex = getParentIndex(i);
+        while (i > 0 && get(i) > get(parentIndex)) {
+            swapNodes(i, parentIndex);
+            i = parentIndex;
+        }
+    }
+
+    public void swapNodes(int i, int j) {
+        int swapValue = nodes[i];
+        nodes[i] = nodes[j];
+        nodes[j] = swapValue;
 
         swaps.add(new Swap(i, j));
-
-        LOGGER.info(
-                String.format(
-                        "item[%s] and item[%s] after swapping: %s, %s", i, j, get(i), get(j)));
     }
 
-    private boolean isValidIndex(int i) {
-        return i >= 0 && i < items.size();
-    }
-
-    private int getLeftIndex(int i) {
+    public int getLeftChildIndex(int i) {
         return 2 * i + 1;
     }
 
-    private int getRightIndex(int i) {
+    public int getRightChildIndex(int i) {
         return 2 * i + 2;
     }
 
-    private Integer get(int i) {
-        return items.get(i);
+    public int getParentIndex(int i) {
+        return Math.floorDiv(i - 1, 2);
     }
 
-    private Optional<Integer> getLeft(int i) {
-        int leftIndex = getLeftIndex(i);
-
-        if (!isValidIndex(leftIndex)) return Optional.empty();
-
-        return Optional.of(items.get(leftIndex));
+    public int get(int i) {
+        return nodes[i];
     }
 
-    private Optional<Integer> getRight(int i) {
-        int rightIndex = getRightIndex(i);
-
-        if (!isValidIndex(rightIndex)) return Optional.empty();
-
-        return Optional.of(items.get(rightIndex));
+    public void set(int i, int value) {
+        nodes[i] = value;
     }
 
-    // private Optional<Integer> getParent(int i) {
-    //     int parentIndex = Math.floorDiv(i - 1, 2);
-
-    //     if (!isValidIndex(parentIndex)) return Optional.empty();
-
-    //     return Optional.of(items.get(parentIndex));
-    // }
+    public List<Swap> getSwaps() {
+        return this.swaps;
+    }
 
     @Override
     public String toString() {
-        return items.toString();
+        return Arrays.toString(nodes);
     }
 }
 
 class Swap {
-    private Integer firstPosition;
-    private Integer secondPosition;
+    private int firstNumber;
+    private int secondNumber;
 
-    public Swap(Integer firstPosition, Integer secondPosition) {
-        this.firstPosition = firstPosition;
-        this.secondPosition = secondPosition;
+    public Swap(int firstNumber, int secondNumber) {
+        this.firstNumber = firstNumber;
+        this.secondNumber = secondNumber;
     }
 
-    public Integer getFirstPosition() {
-        return firstPosition;
+    public int getFirstNumber() {
+        return firstNumber;
     }
 
-    public void setFirstPosition(Integer firstPosition) {
-        this.firstPosition = firstPosition;
+    public int getSecondNumber() {
+        return secondNumber;
     }
 
-    public Integer getSecondPosition() {
-        return secondPosition;
-    }
-
-    public void setSecondPosition(Integer secondPosition) {
-        this.secondPosition = secondPosition;
+    @Override
+    public String toString() {
+        return "Swap [firstNumber=" + firstNumber + ", secondNumber=" + secondNumber + "]";
     }
 }
 
 class MyLogger {
-    private static Logger LOGGER;
-    private static Level LOGGER_LEVEL = Level.OFF;
+    private Logger LOGGER;
+    private Level LOGGER_LEVEL = Level.INFO;
 
-    private static void configureLogger(Logger logger) {
-        logger.setLevel(LOGGER_LEVEL);
+    private void configureLogger() {
+        LOGGER.setLevel(LOGGER_LEVEL);
 
-        logger.setUseParentHandlers(false);
+        LOGGER.setUseParentHandlers(false);
 
         SimpleFormatter simpleFormatter =
                 new SimpleFormatter() {
@@ -213,13 +212,13 @@ class MyLogger {
         ConsoleHandler consoleHandler = new ConsoleHandler();
         consoleHandler.setFormatter(simpleFormatter);
 
-        logger.addHandler(consoleHandler);
+        LOGGER.addHandler(consoleHandler);
     }
 
     public <T> MyLogger(Class<T> myClass) {
         LOGGER = Logger.getLogger(myClass.getName());
 
-        configureLogger(LOGGER);
+        configureLogger();
     }
 
     public Logger getLogger() {
