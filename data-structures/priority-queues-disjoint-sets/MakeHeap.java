@@ -29,6 +29,11 @@ public class MakeHeap {
 
         LOGGER.info("=== Before sorting ===");
         LOGGER.info(String.format("Binary tree items: %s", binaryTree.toString()));
+
+        binaryTree.sort();
+
+        LOGGER.info("=== After sorting ===");
+        LOGGER.info(String.format("Binary tree items: %s", binaryTree.toString()));
     }
 }
 
@@ -44,6 +49,46 @@ class CompleteBinaryTree {
         this.items = items;
     }
 
+    public void sort() {
+        for (int i = items.size() / 2 - 1; i >= 0; i--) {
+            heapify(items.size(), i);
+        }
+
+        for (int i = items.size() - 1; i > 0; i--) {
+            swap(0, i);
+            heapify(i, 0);
+        }
+    }
+
+    private void heapify(int heapSize, int rootValueIndex) {
+        LOGGER.info("=== heapify ===");
+
+        int largestValueIndex = rootValueIndex;
+
+        if (getLeftIndex(rootValueIndex) < heapSize
+                && getLeft(rootValueIndex).get() > get(largestValueIndex)) {
+            largestValueIndex = getLeftIndex(rootValueIndex);
+        }
+
+        if (getRightIndex(rootValueIndex) < heapSize
+                && getRight(rootValueIndex).get() > get(largestValueIndex)) {
+            largestValueIndex = getRightIndex(rootValueIndex);
+        }
+
+        LOGGER.info(String.format("Root value index: %s", rootValueIndex));
+        LOGGER.info(String.format("Root value: %s", get(rootValueIndex)));
+        LOGGER.info(String.format("Left value: %s", getLeft(rootValueIndex)));
+        LOGGER.info(String.format("Right value: %s", getRight(rootValueIndex)));
+        LOGGER.info(String.format("Largest value of the two: %s", get(largestValueIndex)));
+        LOGGER.info(String.format("Largest value index: %s", largestValueIndex));
+
+        if (rootValueIndex != largestValueIndex) {
+            swap(rootValueIndex, largestValueIndex);
+
+            heapify(heapSize, largestValueIndex);
+        }
+    }
+
     private void swap(int i, int j) {
         LOGGER.info(String.format("=== Swapping ==="));
 
@@ -57,7 +102,7 @@ class CompleteBinaryTree {
 
         LOGGER.info(
                 String.format(
-                        "item[%s] and item[%s] before swapping: %s, %s", i, j, get(i), get(j)));
+                        "item[%s] and item[%s] after swapping: %s, %s", i, j, get(i), get(j)));
     }
 
     private boolean isValidIndex(int i) {
