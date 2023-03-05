@@ -27,11 +27,8 @@ public class MakeHeap {
 
         CompleteBinaryTree binaryTree = new CompleteBinaryTree(numbers);
 
+        LOGGER.info("=== Before sorting ===");
         LOGGER.info(String.format("Binary tree items: %s", binaryTree.toString()));
-
-        binaryTree.sort();
-
-        LOGGER.info(String.format("Binary tree items after sorting: %s", binaryTree.toString()));
     }
 }
 
@@ -50,46 +47,17 @@ class CompleteBinaryTree {
     private void swap(int i, int j) {
         LOGGER.info(String.format("=== Swapping ==="));
 
-        LOGGER.info(String.format("item[i] and item[j] before swapping: %s, %s", get(i), get(j)));
+        LOGGER.info(
+                String.format(
+                        "item[%s] and item[%s] before swapping: %s, %s", i, j, get(i), get(j)));
 
         Integer swap = items.get(i);
         items.set(i, items.get(j));
         items.set(j, swap);
 
-        LOGGER.info(String.format("item[i] and item[j] after swapping: %s, %s", get(i), get(j)));
-    }
-
-    public void sort() {
-        for (int i = items.size() / 2 - 1; i >= 0; i--) {
-            heapifyFrom(i);
-        }
-
-        for (int i = items.size() - 1; i > 0; i--) {
-            swap(i, 0);
-            heapifyFrom(0);
-        }
-    }
-
-    private void heapifyFrom(int i) {
-        int largestValueIndex = i;
-
-        Integer rootValue = get(i);
-        Optional<Integer> leftValue = getLeft(i);
-        Optional<Integer> rightValue = getRight(i);
-
-        if (leftValue.isPresent() && leftValue.get() > rootValue) {
-            largestValueIndex = getLeftIndex(i);
-        }
-
-        if (rightValue.isPresent() && rightValue.get() > rootValue) {
-            largestValueIndex = getRightIndex(i);
-        }
-
-        if (i != largestValueIndex) {
-            swap(i, largestValueIndex);
-
-            heapifyFrom(largestValueIndex);
-        }
+        LOGGER.info(
+                String.format(
+                        "item[%s] and item[%s] before swapping: %s, %s", i, j, get(i), get(j)));
     }
 
     private boolean isValidIndex(int i) {
@@ -104,11 +72,11 @@ class CompleteBinaryTree {
         return 2 * i + 2;
     }
 
-    public Integer get(int i) {
+    private Integer get(int i) {
         return items.get(i);
     }
 
-    public Optional<Integer> getLeft(int i) {
+    private Optional<Integer> getLeft(int i) {
         int leftIndex = getLeftIndex(i);
 
         if (!isValidIndex(leftIndex)) return Optional.empty();
@@ -116,7 +84,7 @@ class CompleteBinaryTree {
         return Optional.of(items.get(leftIndex));
     }
 
-    public Optional<Integer> getRight(int i) {
+    private Optional<Integer> getRight(int i) {
         int rightIndex = getRightIndex(i);
 
         if (!isValidIndex(rightIndex)) return Optional.empty();
@@ -124,7 +92,7 @@ class CompleteBinaryTree {
         return Optional.of(items.get(rightIndex));
     }
 
-    public Optional<Integer> getParent(int i) {
+    private Optional<Integer> getParent(int i) {
         int parentIndex = Math.floorDiv(i - 1, 2);
 
         if (!isValidIndex(parentIndex)) return Optional.empty();
