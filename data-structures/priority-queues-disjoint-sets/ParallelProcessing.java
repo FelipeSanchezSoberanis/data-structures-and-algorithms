@@ -44,14 +44,9 @@ public class ParallelProcessing {
 
             DoubleValueNode topNode = tree.peekMin();
 
-            // int bestWorker = 0;
-            // for (int j = 0; j < numWorkers; ++j) {
-            //     if (nextFreeTime[j] < nextFreeTime[bestWorker]) bestWorker = j;
-            // }
             assignedWorker[i] = topNode.getOriginalIndex();
             startTime[i] = topNode.getValue();
             tree.changePriority(0, topNode.getValue() + duration);
-            // nextFreeTime[bestWorker] += duration;
         }
     }
 
