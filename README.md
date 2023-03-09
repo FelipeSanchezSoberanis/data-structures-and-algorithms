@@ -15,6 +15,7 @@
         * [Walking a tree](#walking-a-tree)
     * [Dynamic arrays](#dynamic-arrays)
     * [Priority Queues](#priority-queues)
+    * [Disjoint-set](#disjoint-set)
 
 <!-- vim-markdown-toc -->
 
@@ -178,4 +179,14 @@ Algoriths that use priority queues:
 - Prim's algorithm: constructing a minimum spanning tree of graph
 - Huffman's algorithm: constructing an optimum prefix-fee enconding of a string
 - Heap sort: sorting a given sequence
+
+
+## Disjoint-set
+
+A disjoint-set data structure supports the following operations:
+- MakeSet(x): create a singleton set {x}
+- Find(x): returns id of the set containing x:
+    - if x and y lie in the same set, then Find(x) == Find(y)
+    - Otherwise, Find(x) != Find(y)
+- Union(x, y): merges two sets containing x and y
 
