@@ -41,10 +41,10 @@ class DisjointSets {
     }
 
     public int find(int i) {
-        while (i != parent[i]) {
-            i = parent[i];
+        if (i != parent[i]) {
+            parent[i] = find(parent[i]);
         }
-        return i;
+        return parent[i];
     }
 
     public void union(int i, int j) {
