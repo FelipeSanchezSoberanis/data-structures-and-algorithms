@@ -1,44 +1,83 @@
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.StringTokenizer;
 
 public class ParallelProcessing {
-    public static void main(String[] args) {}
-}
+    private int numWorkers;
+    private int[] jobs;
 
-class MyLogger {
-    private Logger LOGGER;
-    private Level LOGGER_LEVEL = Level.OFF;
+    private int[] assignedWorker;
+    private long[] startTime;
 
-    private void configureLogger() {
-        LOGGER.setLevel(LOGGER_LEVEL);
+    private FastScanner in;
+    private PrintWriter out;
 
-        LOGGER.setUseParentHandlers(false);
-
-        SimpleFormatter simpleFormatter =
-                new SimpleFormatter() {
-                    @Override
-                    public String format(LogRecord logRecord) {
-                        return String.format(
-                                "[%-7s] - %s \n", logRecord.getLevel(), logRecord.getMessage());
-                    }
-                };
-
-        ConsoleHandler consoleHandler = new ConsoleHandler();
-        consoleHandler.setFormatter(simpleFormatter);
-
-        LOGGER.addHandler(consoleHandler);
+    public static void main(String[] args) throws IOException {
+        new ParallelProcessing().solve();
     }
 
-    public <T> MyLogger(Class<T> myClass) {
-        LOGGER = Logger.getLogger(myClass.getName());
-
-        configureLogger();
+    private void readData() throws IOException {
+        numWorkers = in.nextInt();
+        int m = in.nextInt();
+        jobs = new int[m];
+        for (int i = 0; i < m; ++i) {
+            jobs[i] = in.nextInt();
+        }
     }
 
-    public Logger getLogger() {
-        return LOGGER;
+    private void writeResponse() {
+        for (int i = 0; i < jobs.length; ++i) {
+            out.println(assignedWorker[i] + " " + startTime[i]);
+        }
+    }
+
+    private void assignJobs() {
+        // TODO: replace this code with a faster algorithm.
+        assignedWorker = new int[jobs.length];
+        startTime = new long[jobs.length];
+        long[] nextFreeTime = new long[numWorkers];
+        for (int i = 0; i < jobs.length; i++) {
+            int duration = jobs[i];
+            int bestWorker = 0;
+            for (int j = 0; j < numWorkers; ++j) {
+                if (nextFreeTime[j] < nextFreeTime[bestWorker]) bestWorker = j;
+            }
+            assignedWorker[i] = bestWorker;
+            startTime[i] = nextFreeTime[bestWorker];
+            nextFreeTime[bestWorker] += duration;
+        }
+    }
+
+    public void solve() throws IOException {
+        in = new FastScanner();
+        out = new PrintWriter(new BufferedOutputStream(System.out));
+        readData();
+        assignJobs();
+        writeResponse();
+        out.close();
+    }
+
+    static class FastScanner {
+        private BufferedReader reader;
+        private StringTokenizer tokenizer;
+
+        public FastScanner() {
+            reader = new BufferedReader(new InputStreamReader(System.in));
+            tokenizer = null;
+        }
+
+        public String next() throws IOException {
+            while (tokenizer == null || !tokenizer.hasMoreTokens()) {
+                tokenizer = new StringTokenizer(reader.readLine());
+            }
+            return tokenizer.nextToken();
+        }
+
+        public int nextInt() throws IOException {
+            return Integer.parseInt(next());
+        }
     }
 }
