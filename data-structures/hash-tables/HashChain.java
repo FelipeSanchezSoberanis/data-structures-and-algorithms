@@ -3,15 +3,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.StringTokenizer;
 
 public class HashChain {
+
     private FastScanner in;
     private PrintWriter out;
     // store all strings in one list
-    private List<String> elems;
+    private HashMap<Integer, LinkedList<String>> map;
     // for hash function
     private int bucketCount;
     private int prime = 1000000007;
@@ -45,18 +46,50 @@ public class HashChain {
     }
 
     private void processQuery(Query query) {
+        int hash;
+        LinkedList<String> contacts;
         switch (query.getType()) {
             case "add":
-                if (!elems.contains(query.getS())) elems.add(0, query.getS());
+                hash = hashFunc(query.getS());
+
+                contacts = map.containsKey(hash) ? map.get(hash) : new LinkedList<>();
+
+                if (!contacts.stream()
+                        .filter(c -> c.equals(query.getS()))
+                        .findFirst()
+                        .isPresent()) {
+                    contacts.addFirst(query.getS());
+                    map.put(hash, contacts);
+                }
+
                 break;
             case "del":
-                if (elems.contains(query.getS())) elems.remove(query.getS());
+                hash = hashFunc(query.getS());
+
+                if (map.containsKey(hash)) {
+                    contacts = map.get(hash);
+                    contacts.remove(query.getS());
+
+                    if (contacts.isEmpty()) {
+                        map.remove(hash);
+                    } else {
+                        map.put(hash, contacts);
+                    }
+                }
                 break;
             case "find":
-                writeSearchResult(elems.contains(query.getS()));
+                hash = hashFunc(query.getS());
+                writeSearchResult(
+                        map.containsKey(hash)
+                                && map.get(hash).stream()
+                                        .filter(f -> f.equals(query.getS()))
+                                        .findFirst()
+                                        .isPresent());
                 break;
             case "check":
-                for (String cur : elems) if (hashFunc(cur) == query.getInd()) out.print(cur + " ");
+                if (map.containsKey(query.getInd())) {
+                    map.get(query.getInd()).forEach(c -> out.print(c + " "));
+                }
                 out.println();
                 // Uncomment the following if you want to play with the program interactively.
                 // out.flush();
@@ -67,7 +100,7 @@ public class HashChain {
     }
 
     public void processQueries() throws IOException {
-        elems = new ArrayList<>();
+        map = new HashMap<>();
         in = new FastScanner();
         out = new PrintWriter(new BufferedOutputStream(System.out));
         bucketCount = in.nextInt();
