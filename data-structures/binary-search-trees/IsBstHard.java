@@ -48,8 +48,11 @@ class FastScanner {
 }
 
 class IsBST {
+
     private int nodes;
     private Node[] tree;
+
+    public IsBST() {}
 
     public void read() throws IOException {
         FastScanner in = new FastScanner();
@@ -60,21 +63,45 @@ class IsBST {
         }
     }
 
-    private boolean isBinarySearchTreeRecursive(int i, int min, int max) {
-        if (i < 0 || i >= tree.length) return true;
-
-        Node node = tree[i];
-
-        if (node.getKey() == -1) return true;
-
-        if (node.getKey() < min || node.getKey() > max) return false;
-
-        return isBinarySearchTreeRecursive(node.getLeft(), min, node.getKey() - 1)
-                && isBinarySearchTreeRecursive(node.getRight(), node.getKey() - 1, max);
+    private Optional<Node> getNode(int i) {
+        return (i < 0 || i >= tree.length) ? Optional.empty() : Optional.of(tree[i]);
     }
 
     public boolean isBinarySearchTree() {
-        return isBinarySearchTreeRecursive(0, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        if (tree.length == 0 || tree.length == 1) return true;
+
+        Stack<Integer> minStack = new Stack<>();
+        Stack<Node> nodeStack = new Stack<>();
+        Stack<Integer> maxStack = new Stack<>();
+
+        minStack.push(Integer.MIN_VALUE);
+        nodeStack.push(tree[0]);
+        maxStack.push(Integer.MAX_VALUE);
+
+        while (nodeStack.size() > 0) {
+            Integer min = minStack.pop();
+            Node rootNode = nodeStack.pop();
+            Integer max = maxStack.pop();
+
+            if (rootNode.getKey() < min || rootNode.getKey() >= max) {
+                return false;
+            }
+
+            Optional<Node> leftChild = getNode(rootNode.getLeft());
+            Optional<Node> rightChild = getNode(rootNode.getRight());
+            if (leftChild.isPresent()) {
+                minStack.push(min);
+                nodeStack.push(leftChild.get());
+                maxStack.push(rootNode.getKey());
+            }
+            if (rightChild.isPresent()) {
+                minStack.push(rootNode.getKey());
+                nodeStack.push(rightChild.get());
+                maxStack.push(max);
+            }
+        }
+
+        return true;
     }
 }
 
