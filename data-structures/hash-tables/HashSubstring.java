@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.StringTokenizer;
 
 public class HashSubstring {
@@ -31,21 +32,50 @@ public class HashSubstring {
         }
     }
 
-    private static List<Integer> getOccurrences(Data input) {
-        String s = input.getPattern(), t = input.getText();
-        int m = s.length(), n = t.length();
-        List<Integer> occurrences = new ArrayList<Integer>();
-        for (int i = 0; i + m <= n; ++i) {
-            boolean equal = true;
-            for (int j = 0; j < m; ++j) {
-                if (s.charAt(j) != t.charAt(i + j)) {
-                    equal = false;
-                    break;
-                }
-            }
-            if (equal) occurrences.add(i);
+    private static long polyHash(String s, int p, int x) {
+        long hash = 0;
+        for (int i = s.length() - 1; i >= 0; i--) {
+            hash = (hash * x + s.charAt(i)) % p;
         }
-        return occurrences;
+        return hash;
+    }
+
+    private static List<Long> precomputeHashes(String T, int P, int p, int x) {
+        List<Long> H = new ArrayList<>(T.length() - P + 1);
+        for (int i = 0; i < T.length() - P + 1; i++) {
+            H.add(0L);
+        }
+
+        String S = T.substring(T.length() - P, T.length());
+        H.set(T.length() - P, polyHash(S, p, x));
+
+        long y = 1;
+        for (int i = 1; i <= P; i++) {
+            y = (y * x) % p;
+        }
+        for (int i = T.length() - P - 1; i >= 0; i--) {
+            H.set(i, (x * H.get(i + 1) + T.charAt(i) - y * T.charAt(i + P)) % p);
+        }
+
+        return H;
+    }
+
+    private static List<Integer> getOccurrences(Data input) {
+        String P = input.getPattern();
+        String T = input.getText();
+
+        int p = 1000000007;
+        int x = new Random().nextInt(p - 1) + 1;
+        List<Integer> positions = new ArrayList<>();
+        long pHash = polyHash(P, p, x);
+        List<Long> H = precomputeHashes(T, P.length(), p, x);
+
+        for (int i = 0; i < T.length() - P.length() + 1; i++) {
+            if (pHash != H.get(i)) continue;
+
+            if (T.substring(i, i + P.length()).equals(P)) positions.add(i);
+        }
+        return positions;
     }
 }
 
