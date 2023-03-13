@@ -70,7 +70,7 @@ class IsBST {
         if (node.getKey() < min || node.getKey() > max) return false;
 
         return isBinarySearchTreeRecursive(node.getLeft(), min, node.getKey() - 1)
-                && isBinarySearchTreeRecursive(node.getRight(), node.getKey() + 1, max);
+                && isBinarySearchTreeRecursive(node.getRight(), node.getKey() - 1, max);
     }
 
     public boolean isBinarySearchTree() {
