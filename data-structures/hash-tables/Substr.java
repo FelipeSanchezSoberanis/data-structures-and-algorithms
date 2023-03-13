@@ -82,3 +82,39 @@ class FastScanner {
         return Integer.parseInt(next());
     }
 }
+
+class MyLogger {
+    private Logger logger;
+    private Level loggerLevel;
+
+    public MyLogger(String className) {
+        this.logger = Logger.getLogger(className);
+        this.loggerLevel = Level.INFO;
+
+        configureLogger();
+    }
+
+    private void configureLogger() {
+        logger.setLevel(loggerLevel);
+
+        logger.setUseParentHandlers(false);
+
+        SimpleFormatter simpleFormatter =
+                new SimpleFormatter() {
+                    @Override
+                    public String format(LogRecord logRecord) {
+                        return String.format(
+                                "[%s] - %s", logRecord.getLevel(), logRecord.getMessage());
+                    }
+                };
+
+        ConsoleHandler consoleHandler = new ConsoleHandler();
+        consoleHandler.setFormatter(simpleFormatter);
+
+        logger.addHandler(consoleHandler);
+    }
+
+    public void infoFormat(String stringToFormat, Object... variables) {
+        logger.info(String.format(stringToFormat, variables));
+    }
+}
