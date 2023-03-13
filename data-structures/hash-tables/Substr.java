@@ -5,7 +5,6 @@ import java.io.PrintWriter;
 import java.util.StringTokenizer;
 
 public class Substr {
-
     public void run() throws IOException {
         FastScanner in = new FastScanner();
         PrintWriter out = new PrintWriter(System.out);
