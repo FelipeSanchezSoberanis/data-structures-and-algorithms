@@ -30,40 +30,28 @@ public class IsBst {
 }
 
 class FastScanner {
-    StringTokenizer tok = new StringTokenizer("");
-    BufferedReader in;
+    private StringTokenizer tok = new StringTokenizer("");
+    private BufferedReader in;
 
-    FastScanner() {
+    public FastScanner() {
         in = new BufferedReader(new InputStreamReader(System.in));
     }
 
-    String next() throws IOException {
+    private String next() throws IOException {
         while (!tok.hasMoreElements()) tok = new StringTokenizer(in.readLine());
         return tok.nextToken();
     }
 
-    int nextInt() throws IOException {
+    public int nextInt() throws IOException {
         return Integer.parseInt(next());
     }
 }
 
 class IsBST {
-    class Node {
-        int key;
-        int left;
-        int right;
+    private int nodes;
+    private Node[] tree;
 
-        Node(int key, int left, int right) {
-            this.left = left;
-            this.right = right;
-            this.key = key;
-        }
-    }
-
-    int nodes;
-    Node[] tree;
-
-    void read() throws IOException {
+    public void read() throws IOException {
         FastScanner in = new FastScanner();
         nodes = in.nextInt();
         tree = new Node[nodes];
@@ -72,8 +60,56 @@ class IsBST {
         }
     }
 
-    boolean isBinarySearchTree() {
-        // Implement correct algorithm here
-        return true;
+    private boolean isBinarySearchTreeRecursive(int i, int min, int max) {
+        if (i < 0 || i >= tree.length) return true;
+
+        Node node = tree[i];
+
+        if (node.getKey() == -1) return true;
+
+        if (node.getKey() < min || node.getKey() > max) return false;
+
+        return isBinarySearchTreeRecursive(node.getLeft(), min, node.getKey() - 1)
+                && isBinarySearchTreeRecursive(node.getRight(), node.getKey() + 1, max);
+    }
+
+    public boolean isBinarySearchTree() {
+        return isBinarySearchTreeRecursive(0, Integer.MIN_VALUE, Integer.MAX_VALUE);
+    }
+}
+
+class Node {
+    private int key;
+    private int left;
+    private int right;
+
+    Node(int key, int left, int right) {
+        this.left = left;
+        this.right = right;
+        this.key = key;
+    }
+
+    public int getKey() {
+        return key;
+    }
+
+    public void setKey(int key) {
+        this.key = key;
+    }
+
+    public int getLeft() {
+        return left;
+    }
+
+    public void setLeft(int left) {
+        this.left = left;
+    }
+
+    public int getRight() {
+        return right;
+    }
+
+    public void setRight(int right) {
+        this.right = right;
     }
 }
