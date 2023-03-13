@@ -52,27 +52,65 @@ class TreeOrdersInner {
         }
     }
 
+    private Optional<Integer> getLeftChild(int i) {
+        if (left[i] == -1) return Optional.empty();
+        return Optional.of(left[i]);
+    }
+
+    private Optional<Integer> getRightChild(int i) {
+        if (right[i] == -1) return Optional.empty();
+        return Optional.of(right[i]);
+    }
+
+    private int getKey(int i) {
+        return key[i];
+    }
+
+    private void inOrderRecursive(int i, ArrayList<Integer> result) {
+        Optional<Integer> leftChild = getLeftChild(i);
+        if (leftChild.isPresent()) inOrderRecursive(leftChild.get(), result);
+
+        result.add(getKey(i));
+
+        Optional<Integer> rightChild = getRightChild(i);
+        if (rightChild.isPresent()) inOrderRecursive(rightChild.get(), result);
+    }
+
+    private void preOrderRecursive(int i, ArrayList<Integer> result) {
+        result.add(getKey(i));
+
+        Optional<Integer> leftChild = getLeftChild(i);
+        if (leftChild.isPresent()) preOrderRecursive(leftChild.get(), result);
+
+        Optional<Integer> rightChild = getRightChild(i);
+        if (rightChild.isPresent()) preOrderRecursive(rightChild.get(), result);
+    }
+
+    private void postOrderRecursive(int i, ArrayList<Integer> result) {
+        Optional<Integer> leftChild = getLeftChild(i);
+        if (leftChild.isPresent()) postOrderRecursive(leftChild.get(), result);
+
+        Optional<Integer> rightChild = getRightChild(i);
+        if (rightChild.isPresent()) postOrderRecursive(rightChild.get(), result);
+
+        result.add(getKey(i));
+    }
+
     List<Integer> inOrder() {
         ArrayList<Integer> result = new ArrayList<Integer>();
-        // Finish the implementation
-        // You may need to add a new recursive method to do that
-
+        inOrderRecursive(0, result);
         return result;
     }
 
     List<Integer> preOrder() {
         ArrayList<Integer> result = new ArrayList<Integer>();
-        // Finish the implementation
-        // You may need to add a new recursive method to do that
-
+        preOrderRecursive(0, result);
         return result;
     }
 
     List<Integer> postOrder() {
         ArrayList<Integer> result = new ArrayList<Integer>();
-        // Finish the implementation
-        // You may need to add a new recursive method to do that
-
+        postOrderRecursive(0, result);
         return result;
     }
 }
