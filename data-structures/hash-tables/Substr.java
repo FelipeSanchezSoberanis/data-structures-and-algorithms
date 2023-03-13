@@ -48,21 +48,21 @@ class Solver {
         this.s = s;
         this.m1 = 1000000000L + 7L;
         this.m2 = 1000000000L + 9L;
-        this.x = new Random().nextLong(1000000000L) + 1;
+        this.x = new Random().nextLong() + 1;
 
         precomputeHashes();
     }
 
     private void precomputeHashes() {
-        h1 = new long[s.length()];
-        h2 = new long[s.length()];
+        h1 = new long[s.length() + 1];
+        h2 = new long[s.length() + 1];
 
         h1[0] = 0;
         h2[0] = 0;
 
-        for (int i = 1; i < h1.length; i++) {
-            h1[i] = (x * h1[i - 1] + s.charAt(i)) % m1;
-            h2[i] = (x * h2[i - 1] + s.charAt(i)) % m2;
+        for (int i = 1; i <= s.length(); i++) {
+            h1[i] = (x * h1[i - 1] + s.charAt(i - 1)) % m1;
+            h2[i] = (x * h2[i - 1] + s.charAt(i - 1)) % m2;
         }
 
         LOGGER.infoFormat("h1: %s", Arrays.toString(h1));
@@ -70,18 +70,16 @@ class Solver {
     }
 
     private long H(long[] h, int a, int l) {
-        return Math.abs(h[a + l - 1] - x ^ l * h[a]);
+        return Math.abs(h[a + l] - x ^ l * h[a]);
     }
 
     public boolean ask(int a, int b, int l) {
         LOGGER.infoFormat("Substring 1: %s", s.substring(a, a + l));
         LOGGER.infoFormat("Substring 2: %s", s.substring(b, b + l));
         LOGGER.infoFormat("H(h1, a, l) %% m1: %s", H(h1, a, l) % m1);
-        LOGGER.infoFormat("H(h1, b, l) %% m1: %s", H(h1, b, l) % m1);
-        LOGGER.infoFormat("H(h2, a, l) %% m2: %s", H(h2, a, l) % m2);
-        LOGGER.infoFormat("H(h2, b, l) %% m2: %s", H(h2, b, l) % m2);
+        LOGGER.infoFormat("H(h2, a, l) %% m2: %s", H(h1, b, l) % m1);
 
-        return H(h1, a, l) % m1 == H(h1, b, l) % m1 && H(h2, a, l) % m2 == H(h2, b, l) % m2;
+        return s.substring(a, a + l).hashCode() == s.substring(b, b + l).hashCode();
     }
 }
 
@@ -109,7 +107,7 @@ class MyLogger {
 
     public MyLogger(String className) {
         this.logger = Logger.getLogger(className);
-        this.loggerLevel = Level.INFO;
+        this.loggerLevel = Level.OFF;
 
         configureLogger();
     }
