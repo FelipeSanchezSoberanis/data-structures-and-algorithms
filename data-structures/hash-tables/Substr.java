@@ -2,8 +2,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.StringTokenizer;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class Substr {
     public void run() throws IOException {
@@ -27,6 +33,8 @@ public class Substr {
 }
 
 class Solver {
+    private MyLogger LOGGER;
+
     private String s;
     private long m1;
     private long m2;
@@ -35,10 +43,12 @@ class Solver {
     private long[] h2;
 
     public Solver(String s) {
+        this.LOGGER = new MyLogger(Solver.class.getName());
+
         this.s = s;
         this.m1 = 1000000000L + 7L;
         this.m2 = 1000000000L + 9L;
-        this.x = new Random(-1).nextLong(1000000000L) + 1;
+        this.x = new Random().nextLong(1000000000L) + 1;
 
         precomputeHashes();
     }
@@ -54,14 +64,24 @@ class Solver {
             h1[i] = (x * h1[i - 1] + s.charAt(i)) % m1;
             h2[i] = (x * h2[i - 1] + s.charAt(i)) % m2;
         }
+
+        LOGGER.infoFormat("h1: %s", Arrays.toString(h1));
+        LOGGER.infoFormat("h2: %s", Arrays.toString(h2));
     }
 
     private long H(long[] h, int a, int l) {
-        return h[a + l - 1] - x * h[a];
+        return Math.abs(h[a + l - 1] - x ^ l * h[a]);
     }
 
     public boolean ask(int a, int b, int l) {
-        return H(h1, a, l) % m1 == H(h2, b, l) % m1 && H(h1, a, l) % m2 == H(h2, b, l) % m2;
+        LOGGER.infoFormat("Substring 1: %s", s.substring(a, a + l));
+        LOGGER.infoFormat("Substring 2: %s", s.substring(b, b + l));
+        LOGGER.infoFormat("H(h1, a, l) %% m1: %s", H(h1, a, l) % m1);
+        LOGGER.infoFormat("H(h1, b, l) %% m1: %s", H(h1, b, l) % m1);
+        LOGGER.infoFormat("H(h2, a, l) %% m2: %s", H(h2, a, l) % m2);
+        LOGGER.infoFormat("H(h2, b, l) %% m2: %s", H(h2, b, l) % m2);
+
+        return H(h1, a, l) % m1 == H(h1, b, l) % m1 && H(h2, a, l) % m2 == H(h2, b, l) % m2;
     }
 }
 
@@ -115,6 +135,6 @@ class MyLogger {
     }
 
     public void infoFormat(String stringToFormat, Object... variables) {
-        logger.info(String.format(stringToFormat, variables));
+        logger.info(String.format(stringToFormat + "\n", variables));
     }
 }
