@@ -16,7 +16,7 @@ do
     expectedResult=$(cat tests-results/${file##*/}.a)
 
     echo "=== Test result ==="
-    if [ $calculatedResult == $expectedResult ]
+    if [ "$calculatedResult" == "$expectedResult" ]
     then
         echo -e "${GREEN}Correct result${NC}"
     else
