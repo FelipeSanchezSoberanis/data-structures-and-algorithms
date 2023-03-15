@@ -13,7 +13,7 @@ public class Toposort {
     private static MyLogger LOGGER;
 
     private static List<List<Integer>> adj;
-    private static boolean[] isVisited;
+    private static boolean[] isSink;
     private static List<Integer> order;
 
     private static void generateOrder() {
@@ -21,27 +21,27 @@ public class Toposort {
 
         order = new ArrayList<>(adj.size());
 
-        isVisited = new boolean[adj.size()];
-        Arrays.fill(isVisited, false);
+        isSink = new boolean[adj.size()];
+        Arrays.fill(isSink, false);
 
         for (int i = 0; i < adj.size(); i++) {
-            if (!isVisited[i]) {
-                explore(i);
-            }
+            if (!isSink[i]) explore(i);
         }
 
-        order.sort(Collections.reverseOrder());
+        Collections.reverse(order);
     }
 
     private static void explore(int u) {
         LOGGER.infoFormat("Exploring node: %s", u);
 
-        isVisited[u] = true;
         for (int v : adj.get(u)) {
-            if (!isVisited[v]) explore(v);
+            if (!isSink[v]) explore(v);
         }
 
         order.add(u);
+        isSink[u] = true;
+
+        LOGGER.infoFormat("%s marked as a sink", u);
     }
 
     public static void main(String[] args) {
@@ -77,7 +77,7 @@ class MyLogger {
 
     public MyLogger(String className) {
         this.logger = Logger.getLogger(className);
-        this.loggerLevel = Level.OFF;
+        this.loggerLevel = Level.INFO;
 
         configureLogger();
     }
