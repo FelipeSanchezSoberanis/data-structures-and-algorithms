@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.ConsoleHandler;
@@ -10,10 +11,56 @@ import java.util.logging.SimpleFormatter;
 public class Acyclicity {
     private static MyLogger LOGGER;
 
-    private static int acyclic(List<List<Integer>> adj) {
-        LOGGER.infoFormat("adj: %s", adj);
+    private static int clock;
+    private static int[] pre;
+    private static int[] post;
+    private static List<List<Integer>> adj;
+    private static boolean[] isVisited;
 
-        return 0;
+    private static boolean acyclic() {
+        LOGGER.infoFormat("Adjacent list: %s", adj.toString());
+
+        isVisited = new boolean[adj.size()];
+        Arrays.fill(isVisited, false);
+
+        pre = new int[adj.size()];
+        post = new int[adj.size()];
+
+        clock = 1;
+        for (int i = 0; i < adj.size(); i++) {
+            if (!isVisited[i]) {
+                explore(i);
+            }
+        }
+
+        LOGGER.infoFormat("Previsits: %s", Arrays.toString(pre));
+        LOGGER.infoFormat("Postvisits: %s", Arrays.toString(post));
+
+        boolean hasCycle = false;
+        for (int u = 0; u < adj.size(); u++) {
+            List<Integer> vs = adj.get(u);
+            for (int v : vs) {
+                if (post[u] <= post[v]) hasCycle = true;
+            }
+        }
+
+        return hasCycle;
+    }
+
+    private static void explore(int u) {
+        LOGGER.infoFormat("Exploring node: %s", u);
+
+        isVisited[u] = true;
+
+        pre[u] = clock;
+        clock++;
+
+        for (int v : adj.get(u)) {
+            if (!isVisited[v]) explore(v);
+        }
+
+        post[u] = clock;
+        clock++;
     }
 
     public static void main(String[] args) {
@@ -24,7 +71,7 @@ public class Acyclicity {
         int n = scanner.nextInt();
         int m = scanner.nextInt();
 
-        List<List<Integer>> adj = new ArrayList<>(n);
+        adj = new ArrayList<>(n);
         for (int i = 0; i < n; i++) adj.add(new ArrayList<>());
 
         int x, y;
@@ -37,7 +84,7 @@ public class Acyclicity {
 
         scanner.close();
 
-        System.out.println(acyclic(adj));
+        System.out.println(acyclic() ? 1 : 0);
     }
 }
 
@@ -47,7 +94,7 @@ class MyLogger {
 
     public MyLogger(String className) {
         this.logger = Logger.getLogger(className);
-        this.loggerLevel = Level.INFO;
+        this.loggerLevel = Level.OFF;
 
         configureLogger();
     }
