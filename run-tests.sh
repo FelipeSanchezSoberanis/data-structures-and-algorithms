@@ -12,7 +12,7 @@ do
     echo "=== $file ==="
     echo "====$(echo $file | sed -e "s/./=/g")===="
 
-    calculatedResult=$(cat $file | java $javaProgram)
+    calculatedResult=$(cat $file | java $javaProgram | sed -e "s/\s\+$//g")
     expectedResult=$(cat tests-results/${file##*/}.a)
 
     echo "=== Test result ==="
