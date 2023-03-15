@@ -6,8 +6,13 @@ NC="\033[0m"
 
 javaProgram=$1
 
+numTests=0
+passedTests=0
+
 for file in tests/*
 do
+    numTests=$((  numTests + 1  ))
+
     echo "====$(echo $file | sed -e "s/./=/g")===="
     echo "=== $file ==="
     echo "====$(echo $file | sed -e "s/./=/g")===="
@@ -18,6 +23,8 @@ do
     echo "=== Test result ==="
     if [ "$calculatedResult" == "$expectedResult" ]
     then
+        passedTests=$((  passedTests + 1 ))
+
         echo -e "${GREEN}Correct result${NC}"
     else
         echo -e "${RED}Incorrect result${NC}"
@@ -29,4 +36,6 @@ do
 
     echo
 done
+
+echo "Passed ${passedTests} / ${numTests} tests"
 
