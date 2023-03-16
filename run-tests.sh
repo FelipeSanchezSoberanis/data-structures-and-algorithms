@@ -6,10 +6,13 @@ NC="\033[0m"
 
 javaProgram=$1
 
+testCasesDir=testing/test-cases/
+testResultsDir=testing/test-results/
+
 numTests=0
 passedTests=0
 
-for file in tests/*
+for file in ${testCasesDir}*
 do
     numTests=$((  numTests + 1  ))
 
@@ -18,7 +21,7 @@ do
     echo "====$(echo $file | sed -e "s/./=/g")===="
 
     calculatedResult=$(cat $file | java $javaProgram | sed -e "s/\s\+$//g")
-    expectedResult=$(cat tests-results/${file##*/}.a)
+    expectedResult=$(cat ${testResultsDir}${file##*/})
 
     echo "=== Test result ==="
     if [ "$calculatedResult" == "$expectedResult" ]
