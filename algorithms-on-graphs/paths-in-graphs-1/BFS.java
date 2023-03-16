@@ -1,5 +1,8 @@
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Queue;
 import java.util.Scanner;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
@@ -8,8 +11,6 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 public class BFS {
-    private static MyLogger LOGGER;
-
     private static List<List<Integer>> readGraphConnections(Scanner scanner) {
         int n = scanner.nextInt();
         int m = scanner.nextInt();
@@ -38,8 +39,6 @@ public class BFS {
     }
 
     public static void main(String[] args) {
-        LOGGER = new MyLogger(BFS.class.getName());
-
         Scanner scanner = new Scanner(System.in);
 
         List<List<Integer>> adj = readGraphConnections(scanner);
@@ -56,6 +55,40 @@ public class BFS {
         System.out.println(pathLength);
     }
 }
+
+class Graph {
+    private MyLogger LOGGER;
+
+    private List<List<Integer>> adj;
+
+    public Graph(List<List<Integer>> adj) {
+        LOGGER = new MyLogger(Graph.class.getName());
+
+        this.adj = adj;
+    }
+
+    public int getPathLength(int from, int to) {
+        int[] dist = new int[adj.size()];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+
+        dist[from] = 0;
+
+        Queue<Integer> queue = new ArrayDeque<>();
+        queue.add(from);
+
+        while (!queue.isEmpty()) {
+            int u = queue.poll();
+
+            for (int v : adj.get(u)) {
+                if (dist[v] == Integer.MAX_VALUE) {
+                    queue.add(v);
+                    dist[v] = dist[u] + 1;
+                    if (v == to) return dist[to] != Integer.MAX_VALUE ? dist[to] : -1;
+                }
+            }
+        }
+
+        return dist[to] != Integer.MAX_VALUE ? dist[to] : -1;
     }
 }
 
