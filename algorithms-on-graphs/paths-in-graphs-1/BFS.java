@@ -10,9 +10,7 @@ import java.util.logging.SimpleFormatter;
 public class BFS {
     private static MyLogger LOGGER;
 
-    private static List<List<Integer>> readData() {
-        Scanner scanner = new Scanner(System.in);
-
+    private static List<List<Integer>> readGraphConnections(Scanner scanner) {
         int n = scanner.nextInt();
         int m = scanner.nextInt();
 
@@ -25,18 +23,39 @@ public class BFS {
             y = scanner.nextInt();
 
             adj.get(x - 1).add(y - 1);
+            adj.get(y - 1).add(x - 1);
         }
 
-        scanner.close();
-
         return adj;
+    }
+
+    private static int[] readConnectionToSearch(Scanner scanner) {
+        int from = scanner.nextInt();
+        int to = scanner.nextInt();
+
+        int[] fromAndTo = {from, to};
+        return fromAndTo;
     }
 
     public static void main(String[] args) {
         LOGGER = new MyLogger(BFS.class.getName());
 
-        List<List<Integer>> adj = readData();
-        LOGGER.infoFormat("Adjacent list: %s", adj.toString());
+        Scanner scanner = new Scanner(System.in);
+
+        List<List<Integer>> adj = readGraphConnections(scanner);
+        int[] fromAndTo = readConnectionToSearch(scanner);
+
+        scanner.close();
+
+        int from = fromAndTo[0];
+        int to = fromAndTo[1];
+
+        Graph graph = new Graph(adj);
+        int pathLength = graph.getPathLength(from - 1, to - 1);
+
+        System.out.println(pathLength);
+    }
+}
     }
 }
 
