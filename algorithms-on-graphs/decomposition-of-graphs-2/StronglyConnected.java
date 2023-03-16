@@ -65,37 +65,6 @@ public class StronglyConnected {
     }
 }
 
-class VertexWithPostValue {
-    private int vertexValue;
-    private int postValue;
-
-    public VertexWithPostValue(int vertexValue, int postValue) {
-        this.vertexValue = vertexValue;
-        this.postValue = postValue;
-    }
-
-    public int getVertexValue() {
-        return vertexValue;
-    }
-
-    public void setVertexValue(int vertexValue) {
-        this.vertexValue = vertexValue;
-    }
-
-    public int getPostValue() {
-        return postValue;
-    }
-
-    public void setPostValue(int postValue) {
-        this.postValue = postValue;
-    }
-
-    @Override
-    public String toString() {
-        return "VertexWithPostValue [postValue=" + postValue + ", vertexValue=" + vertexValue + "]";
-    }
-}
-
 class MyLogger {
     private Logger logger;
     private Level loggerLevel;
