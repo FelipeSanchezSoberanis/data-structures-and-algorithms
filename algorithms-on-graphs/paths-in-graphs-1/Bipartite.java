@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+import java.util.stream.Collectors;
 
 public class Bipartite {
     private static List<List<Integer>> readGraphConnections(Scanner scanner) {
@@ -30,29 +31,17 @@ public class Bipartite {
         return adj;
     }
 
-    private static int[] readConnectionToSearch(Scanner scanner) {
-        int from = scanner.nextInt();
-        int to = scanner.nextInt();
-
-        int[] fromAndTo = {from, to};
-        return fromAndTo;
-    }
-
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
         List<List<Integer>> adj = readGraphConnections(scanner);
-        int[] fromAndTo = readConnectionToSearch(scanner);
 
         scanner.close();
 
-        int from = fromAndTo[0];
-        int to = fromAndTo[1];
-
         Graph graph = new Graph(adj);
-        int pathLength = graph.getPathLength(from - 1, to - 1);
+        boolean isBipartite = graph.isBipartite();
 
-        System.out.println(pathLength);
+        System.out.println(isBipartite ? 1 : 0);
     }
 }
 
@@ -65,6 +54,45 @@ class Graph {
         LOGGER = new MyLogger(Graph.class.getName());
 
         this.adj = adj;
+    }
+
+    public boolean isBipartite() {
+        int[] group = new int[adj.size()];
+        Arrays.fill(group, -1);
+
+        Queue<Integer> queue = new ArrayDeque<>();
+
+        for (int i = 0; i < adj.size(); i++) {
+            if (group[i] != -1) continue;
+
+            queue.add(i);
+            group[i] = 0;
+
+            while (!queue.isEmpty()) {
+                int u = queue.poll();
+
+                LOGGER.infoFormat("Origin node: %s", u);
+                LOGGER.infoFormat("Neighbour nodes: %s", adj.get(u));
+                LOGGER.infoFormat(
+                        "Groups of neighbour nodes before: %s",
+                        adj.get(u).stream().map(v -> group[v]).collect(Collectors.toList()));
+
+                for (int v : adj.get(u)) {
+                    if (group[v] == -1) {
+                        queue.add(v);
+                        group[v] = group[u] == 0 ? 1 : 0;
+                    } else if (group[v] == group[u]) {
+                        return false;
+                    }
+                }
+
+                LOGGER.infoFormat(
+                        "Groups of neighbour nodes after: %s",
+                        adj.get(u).stream().map(v -> group[v]).collect(Collectors.toList()));
+            }
+        }
+
+        return !Arrays.stream(group).filter(v -> group[v] == -1).findFirst().isPresent();
     }
 
     public int getPathLength(int from, int to) {
