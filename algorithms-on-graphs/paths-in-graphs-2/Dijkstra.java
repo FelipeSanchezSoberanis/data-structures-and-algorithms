@@ -22,13 +22,27 @@ public class Dijkstra {
     public static void main(String[] args) {
         LOGGER = new MyLogger(Dijkstra.class.getName());
 
+        DataReader dr = new DataReader();
+        dr.readData();
+
+        System.out.println(distance(dr.getAdj(), dr.getCost(), dr.getX(), dr.getY()));
+    }
+}
+
+class DataReader {
+    private List<List<Integer>> adj;
+    private List<List<Integer>> cost;
+    private int x;
+    private int y;
+
+    public void readData() {
         Scanner scanner = new Scanner(System.in);
 
         int n = scanner.nextInt();
         int m = scanner.nextInt();
 
-        List<List<Integer>> adj = new ArrayList<>(n);
-        List<List<Integer>> cost = new ArrayList<>(n);
+        adj = new ArrayList<>(n);
+        cost = new ArrayList<>(n);
 
         for (int i = 0; i < n; i++) {
             adj.add(new ArrayList<>());
@@ -46,12 +60,26 @@ public class Dijkstra {
             cost.get(x - 1).add(w);
         }
 
-        int x = scanner.nextInt() - 1;
-        int y = scanner.nextInt() - 1;
+        x = scanner.nextInt() - 1;
+        y = scanner.nextInt() - 1;
 
         scanner.close();
+    }
 
-        System.out.println(distance(adj, cost, x, y));
+    public List<List<Integer>> getAdj() {
+        return adj;
+    }
+
+    public List<List<Integer>> getCost() {
+        return cost;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
     }
 }
 
