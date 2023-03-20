@@ -15,8 +15,7 @@ import java.util.logging.SimpleFormatter;
 public class Dijkstra {
     private static MyLogger LOGGER;
 
-    private static long distance(
-            List<List<Integer>> adj, List<List<Integer>> cost, int from, int to) {
+    private static long distance(List<List<Integer>> adj, int[][] cost, int from, int to) {
         LOGGER.info("=== General data ===");
         LOGGER.infoFormat("adj: %s", adj.toString());
         LOGGER.infoFormat("cost: %s", cost.toString());
@@ -47,7 +46,7 @@ public class Dijkstra {
             int u = H.poll();
 
             for (int v : adj.get(u)) {
-                int connCost = getConnCost(u, v, adj, cost);
+                int connCost = cost[u][v];
                 if (dist[v] > dist[u] + connCost) {
                     dist[v] = dist[u] + connCost;
 
@@ -70,17 +69,6 @@ public class Dijkstra {
         return dist[to] != Integer.MAX_VALUE ? dist[to] : -1;
     }
 
-    private static Integer getConnCost(
-            Integer from, Integer to, List<List<Integer>> adj, List<List<Integer>> cost) {
-        LOGGER.info("=== Connection cost ===");
-
-        Integer result = cost.get(from).get(adj.get(from).indexOf(to));
-        LOGGER.infoFormat("Cost from %s to %s: %s", from, to, result);
-        LOGGER.info();
-
-        return result;
-    }
-
     public static void main(String[] args) {
         LOGGER = new MyLogger(Dijkstra.class.getName());
 
@@ -93,7 +81,7 @@ public class Dijkstra {
 
 class DataReader {
     private List<List<Integer>> adj;
-    private List<List<Integer>> cost;
+    private int[][] cost;
     private int x;
     private int y;
 
@@ -104,11 +92,10 @@ class DataReader {
         int m = scanner.nextInt();
 
         adj = new ArrayList<>(n);
-        cost = new ArrayList<>(n);
+        cost = new int[n][n];
 
         for (int i = 0; i < n; i++) {
             adj.add(new ArrayList<>());
-            cost.add(new ArrayList<>());
         }
 
         for (int i = 0; i < m; i++) {
@@ -119,7 +106,7 @@ class DataReader {
             w = scanner.nextInt();
 
             adj.get(x - 1).add(y - 1);
-            cost.get(x - 1).add(w);
+            cost[x - 1][y - 1] = w;
         }
 
         x = scanner.nextInt() - 1;
@@ -132,7 +119,7 @@ class DataReader {
         return adj;
     }
 
-    public List<List<Integer>> getCost() {
+    public int[][] getCost() {
         return cost;
     }
 
