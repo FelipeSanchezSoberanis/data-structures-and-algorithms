@@ -1,5 +1,10 @@
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Scanner;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
@@ -10,13 +15,70 @@ import java.util.logging.SimpleFormatter;
 public class Dijkstra {
     private static MyLogger LOGGER;
 
-    private static long distance(List<List<Integer>> adj, List<List<Integer>> cost, int s, int t) {
-        LOGGER.infoFormat("Adj: %s", adj.toString());
-        LOGGER.infoFormat("Cost: %s", cost.toString());
-        LOGGER.infoFormat("s: %s", s);
-        LOGGER.infoFormat("t: %s", t);
+    private static long distance(
+            List<List<Integer>> adj, List<List<Integer>> cost, int from, int to) {
+        LOGGER.info("=== General data ===");
+        LOGGER.infoFormat("adj: %s", adj.toString());
+        LOGGER.infoFormat("cost: %s", cost.toString());
+        LOGGER.infoFormat("from: %s", from);
+        LOGGER.infoFormat("to: %s", to);
+        LOGGER.info();
 
-        return -1;
+        long[] dist = new long[adj.size()];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+
+        dist[from] = 0;
+
+        Map<Integer, Long> priorities = new HashMap<>();
+        PriorityQueue<Integer> H =
+                new PriorityQueue<>(
+                        adj.size(), Comparator.comparing(entry -> priorities.get(entry)));
+
+        for (int i = 0; i < adj.size(); i++) {
+            priorities.put(i, Long.valueOf(i));
+            H.add(i);
+        }
+
+        LOGGER.info("=== Priority queue ===");
+        LOGGER.infoFormat("Original priority queue: %s", H.toString());
+        LOGGER.info();
+
+        while (!H.isEmpty()) {
+            int u = H.poll();
+
+            for (int v : adj.get(u)) {
+                int connCost = getConnCost(u, v, adj, cost);
+                if (dist[v] > dist[u] + connCost) {
+                    dist[v] = dist[u] + connCost;
+
+                    LOGGER.info("=== Updating priority ===");
+                    LOGGER.infoFormat(
+                            "Updating priority for %s from %s to %s",
+                            v, priorities.get(v), dist[v]);
+                    LOGGER.infoFormat("Priority queue before: %s", H.toString());
+
+                    H.remove(v);
+                    priorities.put(v, dist[v]);
+                    H.add(v);
+
+                    LOGGER.infoFormat("Priority queue after: %s", H.toString());
+                    LOGGER.info();
+                }
+            }
+        }
+
+        return dist[to] != Integer.MAX_VALUE ? dist[to] : -1;
+    }
+
+    private static Integer getConnCost(
+            Integer from, Integer to, List<List<Integer>> adj, List<List<Integer>> cost) {
+        LOGGER.info("=== Connection cost ===");
+
+        Integer result = cost.get(from).get(adj.get(from).indexOf(to));
+        LOGGER.infoFormat("Cost from %s to %s: %s", from, to, result);
+        LOGGER.info();
+
+        return result;
     }
 
     public static void main(String[] args) {
