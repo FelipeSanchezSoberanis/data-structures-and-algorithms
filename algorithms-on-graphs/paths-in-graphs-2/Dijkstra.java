@@ -117,4 +117,12 @@ class MyLogger {
     public void infoFormat(String stringToFormat, Object... variables) {
         logger.info(String.format(stringToFormat + "\n", variables));
     }
+
+    public void info(String info) {
+        logger.info(info + "\n");
+    }
+
+    public void info() {
+        logger.info("\n");
+    }
 }
