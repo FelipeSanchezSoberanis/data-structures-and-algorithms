@@ -151,7 +151,7 @@ class MyLogger {
 
     public MyLogger(String className) {
         this.logger = Logger.getLogger(className);
-        this.loggerLevel = Level.INFO;
+        this.loggerLevel = Level.OFF;
 
         configureLogger();
     }
