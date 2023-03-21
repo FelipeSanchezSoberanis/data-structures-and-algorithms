@@ -1,209 +1,69 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Scanner;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
+import java.util.*;
 
 public class Dijkstra {
-    private static MyLogger LOGGER;
+    private static final int inf = Integer.MAX_VALUE;
 
-    private static long distance(List<List<Integer>> adj, int[][] cost, int from, int to) {
-        LOGGER.info("=== General data ===");
-        LOGGER.infoFormat("adj: %s", adj.toString());
-        LOGGER.infoFormat("cost: %s", cost.toString());
-        LOGGER.infoFormat("from: %s", from);
-        LOGGER.infoFormat("to: %s", to);
-        LOGGER.info();
+    public static class Node implements Comparable<Node> {
+        int index;
+        long distance;
 
-        long[] dist = new long[adj.size()];
-        Arrays.fill(dist, Integer.MAX_VALUE);
-
-        dist[from] = 0;
-
-        Map<Integer, Long> priorities = new HashMap<>();
-        PriorityQueue<PriorityQueueNode> queue = new PriorityQueue<>(adj.size());
-
-        for (int i = 0; i < adj.size(); i++) {
-            priorities.put(i, dist[i]);
-            queue.add(new PriorityQueueNode(i, priorities.get(i)));
+        public Node(int index, long distance) {
+            this.index = index;
+            this.distance = distance;
         }
 
-        LOGGER.info("=== Priority queue ===");
-        LOGGER.infoFormat("Original priority queue: %s", queue.toString());
-        LOGGER.info();
+        @Override
+        public int compareTo(Node o) {
+            if (this.distance > o.distance) return 1;
+            else if (this.distance < o.distance) return -1;
+            else return 0;
+        }
+    }
 
+    private static int distance(ArrayList<Integer>[] adj, ArrayList<Integer>[] cost, int s, int t) {
+        // write your code here
+        int[] dist = new int[adj.length];
+        for (int i = 0; i < dist.length; i++) {
+            dist[i] = inf;
+        }
+        dist[s] = 0;
+        PriorityQueue<Node> queue = new PriorityQueue<Node>();
+        queue.add(new Node(s, dist[s]));
         while (!queue.isEmpty()) {
-            PriorityQueueNode topNode = queue.poll();
-            int u = topNode.getValue();
-
-            if (topNode.getPriority() != priorities.get(u)) continue;
-
-            for (int v : adj.get(u)) {
-                int connCost = cost[u][v];
-                if (dist[v] > dist[u] + connCost) {
-                    dist[v] = dist[u] + connCost;
-
-                    LOGGER.info("=== Updating priority ===");
-                    LOGGER.infoFormat(
-                            "Updating priority for %s from %s to %s",
-                            v, priorities.get(v), dist[v]);
-                    LOGGER.infoFormat("Priority queue before: %s", queue.toString());
-
-                    priorities.put(v, dist[v]);
-                    queue.add(new PriorityQueueNode(v, priorities.get(v)));
-
-                    LOGGER.infoFormat("Priority queue after: %s", queue.toString());
-                    LOGGER.info();
+            Node u = queue.remove();
+            int u_index = u.index;
+            for (int v : adj[u_index]) {
+                int v_index = adj[u_index].indexOf(v);
+                if (dist[v] > dist[u_index] + cost[u_index].get(v_index)) {
+                    dist[v] = dist[u_index] + cost[u_index].get(v_index);
+                    queue.add(new Node(v, dist[v]));
                 }
             }
         }
-
-        return dist[to] != Integer.MAX_VALUE ? dist[to] : -1;
+        if (dist[t] == inf) return -1;
+        return dist[t];
     }
 
     public static void main(String[] args) {
-        LOGGER = new MyLogger(Dijkstra.class.getName());
-
-        DataReader dr = new DataReader();
-        dr.readData();
-
-        System.out.println(distance(dr.getAdj(), dr.getCost(), dr.getX(), dr.getY()));
-    }
-}
-
-class PriorityQueueNode implements Comparable<PriorityQueueNode> {
-    private int value;
-    private long priority;
-
-    public PriorityQueueNode(int value, long priority) {
-        this.value = value;
-        this.priority = priority;
-    }
-
-    public PriorityQueueNode() {}
-
-    public long getPriority() {
-        return priority;
-    }
-
-    public void setPriority(int priority) {
-        this.priority = priority;
-    }
-
-    public int getValue() {
-        return value;
-    }
-
-    public void setValue(int value) {
-        this.value = value;
-    }
-
-    @Override
-    public int compareTo(PriorityQueueNode node) {
-        return Long.valueOf(this.priority).compareTo(Long.valueOf(node.getPriority()));
-    }
-}
-
-class DataReader {
-    private List<List<Integer>> adj;
-    private int[][] cost;
-    private int x;
-    private int y;
-
-    public void readData() {
         Scanner scanner = new Scanner(System.in);
-
         int n = scanner.nextInt();
         int m = scanner.nextInt();
-
-        adj = new ArrayList<>(n);
-        cost = new int[n][n];
-
+        ArrayList<Integer>[] adj = (ArrayList<Integer>[]) new ArrayList[n];
+        ArrayList<Integer>[] cost = (ArrayList<Integer>[]) new ArrayList[n];
         for (int i = 0; i < n; i++) {
-            adj.add(new ArrayList<>());
+            adj[i] = new ArrayList<Integer>();
+            cost[i] = new ArrayList<Integer>();
         }
-
         for (int i = 0; i < m; i++) {
             int x, y, w;
-
             x = scanner.nextInt();
             y = scanner.nextInt();
             w = scanner.nextInt();
-
-            adj.get(x - 1).add(y - 1);
-            cost[x - 1][y - 1] = w;
+            adj[x - 1].add(y - 1);
+            cost[x - 1].add(w);
         }
-
-        x = scanner.nextInt() - 1;
-        y = scanner.nextInt() - 1;
-
-        scanner.close();
-    }
-
-    public List<List<Integer>> getAdj() {
-        return adj;
-    }
-
-    public int[][] getCost() {
-        return cost;
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-}
-
-class MyLogger {
-    private Logger logger;
-    private Level loggerLevel;
-
-    public MyLogger(String className) {
-        this.logger = Logger.getLogger(className);
-        this.loggerLevel = Level.OFF;
-
-        configureLogger();
-    }
-
-    private void configureLogger() {
-        logger.setLevel(loggerLevel);
-
-        logger.setUseParentHandlers(false);
-
-        SimpleFormatter simpleFormatter =
-                new SimpleFormatter() {
-                    @Override
-                    public String format(LogRecord logRecord) {
-                        return String.format(
-                                "[%s] - %s", logRecord.getLevel(), logRecord.getMessage());
-                    }
-                };
-
-        ConsoleHandler consoleHandler = new ConsoleHandler();
-        consoleHandler.setFormatter(simpleFormatter);
-
-        logger.addHandler(consoleHandler);
-    }
-
-    public void infoFormat(String stringToFormat, Object... variables) {
-        logger.info(String.format(stringToFormat + "\n", variables));
-    }
-
-    public void info(String info) {
-        logger.info(info + "\n");
-    }
-
-    public void info() {
-        logger.info("\n");
+        int x = scanner.nextInt() - 1;
+        int y = scanner.nextInt() - 1;
+        System.out.println(distance(adj, cost, x, y));
     }
 }
