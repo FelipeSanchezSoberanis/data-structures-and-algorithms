@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,21 +28,22 @@ public class Dijkstra {
         dist[from] = 0;
 
         Map<Integer, Long> priorities = new HashMap<>();
-        PriorityQueue<Integer> H =
-                new PriorityQueue<>(
-                        adj.size(), Comparator.comparing(entry -> priorities.get(entry)));
+        PriorityQueue<PriorityQueueNode> queue = new PriorityQueue<>(adj.size());
 
         for (int i = 0; i < adj.size(); i++) {
-            priorities.put(i, Long.valueOf(i));
-            H.add(i);
+            priorities.put(i, dist[i]);
+            queue.add(new PriorityQueueNode(i, priorities.get(i)));
         }
 
         LOGGER.info("=== Priority queue ===");
-        LOGGER.infoFormat("Original priority queue: %s", H.toString());
+        LOGGER.infoFormat("Original priority queue: %s", queue.toString());
         LOGGER.info();
 
-        while (!H.isEmpty()) {
-            int u = H.poll();
+        while (!queue.isEmpty()) {
+            PriorityQueueNode topNode = queue.poll();
+            int u = topNode.getValue();
+
+            if (topNode.getPriority() != priorities.get(u)) continue;
 
             for (int v : adj.get(u)) {
                 int connCost = cost[u][v];
@@ -54,13 +54,12 @@ public class Dijkstra {
                     LOGGER.infoFormat(
                             "Updating priority for %s from %s to %s",
                             v, priorities.get(v), dist[v]);
-                    LOGGER.infoFormat("Priority queue before: %s", H.toString());
+                    LOGGER.infoFormat("Priority queue before: %s", queue.toString());
 
-                    H.remove(v);
                     priorities.put(v, dist[v]);
-                    H.add(v);
+                    queue.add(new PriorityQueueNode(v, priorities.get(v)));
 
-                    LOGGER.infoFormat("Priority queue after: %s", H.toString());
+                    LOGGER.infoFormat("Priority queue after: %s", queue.toString());
                     LOGGER.info();
                 }
             }
@@ -76,6 +75,39 @@ public class Dijkstra {
         dr.readData();
 
         System.out.println(distance(dr.getAdj(), dr.getCost(), dr.getX(), dr.getY()));
+    }
+}
+
+class PriorityQueueNode implements Comparable<PriorityQueueNode> {
+    private int value;
+    private long priority;
+
+    public PriorityQueueNode(int value, long priority) {
+        this.value = value;
+        this.priority = priority;
+    }
+
+    public PriorityQueueNode() {}
+
+    public long getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
+
+    @Override
+    public int compareTo(PriorityQueueNode node) {
+        return Long.valueOf(this.priority).compareTo(Long.valueOf(node.getPriority()));
     }
 }
 
