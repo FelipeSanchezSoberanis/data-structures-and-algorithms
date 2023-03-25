@@ -29,6 +29,42 @@ public class ConnectingPoints {
     }
 }
 
+class DisjointSet<T> {
+    private Map<T, T> parent;
+    private Map<T, Integer> rank;
+
+    public DisjointSet(List<T> universe) {
+        parent = new HashMap<>();
+        rank = new HashMap<>();
+
+        for (T i : universe) {
+            parent.put(i, i);
+            rank.put(i, 0);
+        }
+    }
+
+    public T find(T k) {
+        if (!parent.get(k).equals(k)) parent.put(k, find(parent.get(k)));
+        return parent.get(k);
+    }
+
+    public void union(T a, T b) {
+        T x = find(a);
+        T y = find(b);
+
+        if (x.equals(y)) return;
+
+        if (rank.get(x) > rank.get(y)) {
+            parent.put(y, x);
+        } else if (rank.get(x) < rank.get(y)) {
+            parent.put(x, y);
+        } else {
+            parent.put(x, y);
+            rank.put(y, rank.get(y) + 1);
+        }
+    }
+}
+
 class Edge {
     private Vertex vertexA;
     private Vertex vertexB;
