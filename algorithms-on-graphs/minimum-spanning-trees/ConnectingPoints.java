@@ -22,7 +22,6 @@ public class ConnectingPoints {
     }
 
     public static void main(String[] args) {
-
         DataReader dataReader = new DataReader();
         dataReader.readData();
 
