@@ -60,10 +60,16 @@ class DataReader {
 class MyLogger {
     private Logger logger;
     private Level loggerLevel;
+    private static final Level GLOBAL_LOGGER_LEVEL = Level.OFF;
+
+    public MyLogger disabled() {
+        this.logger.setLevel(Level.OFF);
+        return this;
+    }
 
     public MyLogger(String className) {
         this.logger = Logger.getLogger(className);
-        this.loggerLevel = Level.INFO;
+        this.loggerLevel = GLOBAL_LOGGER_LEVEL;
 
         configureLogger();
     }
@@ -78,7 +84,10 @@ class MyLogger {
                     @Override
                     public String format(LogRecord logRecord) {
                         return String.format(
-                                "[%s] - %s", logRecord.getLevel(), logRecord.getMessage());
+                                "[%s]: %s - %s",
+                                logRecord.getLevel(),
+                                logRecord.getLoggerName(),
+                                logRecord.getMessage());
                     }
                 };
 
