@@ -29,6 +29,64 @@ public class ConnectingPoints {
     }
 }
 
+class Edge {
+    private Vertex vertexA;
+    private Vertex vertexB;
+    private double distance;
+
+    public Edge(Vertex vertexA, Vertex vertexB) {
+        this.vertexA = vertexA;
+        this.vertexB = vertexB;
+        this.distance = Vertex.getDistance(vertexA, vertexB);
+    }
+
+    public Vertex getVertexA() {
+        return vertexA;
+    }
+
+    public Vertex getVertexB() {
+        return vertexB;
+    }
+
+    public double getDistance() {
+        return distance;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        long temp;
+        temp = Double.doubleToLongBits(distance);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
+        result = prime * result + ((vertexA == null) ? 0 : vertexA.hashCode());
+        result = prime * result + ((vertexB == null) ? 0 : vertexB.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
+        Edge other = (Edge) obj;
+        if (Double.doubleToLongBits(distance) != Double.doubleToLongBits(other.distance))
+            return false;
+        if (vertexA == null) {
+            if (other.vertexA != null) return false;
+        } else if (!vertexA.equals(other.vertexA)) return false;
+        if (vertexB == null) {
+            if (other.vertexB != null) return false;
+        } else if (!vertexB.equals(other.vertexB)) return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "Edge [distance=" + distance + ", vertexA=" + vertexA + ", vertexB=" + vertexB + "]";
+    }
+}
+
 class Vertex {
     private static MyLogger LOGGER = new MyLogger(Vertex.class.getName()).disabled();
 
