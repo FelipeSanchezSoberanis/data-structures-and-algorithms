@@ -11,7 +11,6 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
-import java.util.stream.Collectors;
 
 public class ConnectingPoints {
     private static MyLogger LOGGER = new MyLogger(ConnectingPoints.class.getName());
@@ -40,6 +39,8 @@ public class ConnectingPoints {
         LOGGER.infoFormat("Number of edges: %s", edges.size());
         LOGGER.infoFormat("Edges: %s", edges.toString());
 
+        double result = 0.0;
+
         for (Edge edge : edges) {
             Vertex u = edge.getVertexA();
             Vertex v = edge.getVertexB();
@@ -47,13 +48,9 @@ public class ConnectingPoints {
             if (!disjointSet.find(u).equals(disjointSet.find(v))) {
                 edgeSet.add(edge);
                 disjointSet.union(u, v);
+                result += edge.getDistance();
             }
         }
-
-        double result = 0.0;
-
-        for (Edge edge : edgeSet.stream().collect(Collectors.toList()))
-            result += edge.getDistance();
 
         return result;
     }
