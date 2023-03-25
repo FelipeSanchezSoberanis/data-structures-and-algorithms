@@ -1,10 +1,17 @@
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+import java.util.stream.Collectors;
 
 public class ConnectingPoints {
     private static MyLogger LOGGER = new MyLogger(ConnectingPoints.class.getName());
@@ -14,10 +21,40 @@ public class ConnectingPoints {
         LOGGER.infoFormat("x: %s", Arrays.toString(x));
         LOGGER.infoFormat("y: %s", Arrays.toString(y));
 
-        double result = 0;
-        // write your code here
+        List<Vertex> vertices = new ArrayList<>(x.length);
+        for (int i = 0; i < x.length; i++) vertices.add(new Vertex(x[i], y[i]));
 
-        LOGGER.info("");
+        DisjointSet<Vertex> disjointSet = new DisjointSet<>(vertices);
+        Set<Edge> edgeSet = new HashSet<>();
+        List<Edge> edges = new ArrayList<>();
+
+        for (Vertex v : vertices) {
+            for (Vertex u : vertices) {
+                if (v.equals(u)) continue;
+                edges.add(new Edge(u, v));
+            }
+        }
+
+        edges.sort((a, b) -> a.getDistance() > b.getDistance() ? 1 : -1);
+
+        LOGGER.infoFormat("Number of edges: %s", edges.size());
+        LOGGER.infoFormat("Edges: %s", edges.toString());
+
+        for (Edge edge : edges) {
+            Vertex u = edge.getVertexA();
+            Vertex v = edge.getVertexB();
+
+            if (!disjointSet.find(u).equals(disjointSet.find(v))) {
+                edgeSet.add(edge);
+                disjointSet.union(u, v);
+            }
+        }
+
+        double result = 0.0;
+
+        for (Edge edge : edgeSet.stream().collect(Collectors.toList()))
+            result += edge.getDistance();
+
         return result;
     }
 
@@ -181,6 +218,7 @@ class Vertex {
         return "Vertex [x=" + x + ", y=" + y + "]";
     }
 }
+
 class DataReader {
     private int[] x;
     private int[] y;
