@@ -78,8 +78,12 @@ class DisjointSet<T> {
     }
 
     public T find(T k) {
-        if (!parent.get(k).equals(k)) parent.put(k, find(parent.get(k)));
-        return parent.get(k);
+        if (k.equals(parent.get(k))) return k;
+
+        T parentNode = parent.get(k);
+        while (!parentNode.equals(parent.get(parentNode))) parentNode = parent.get(parentNode);
+
+        return parentNode;
     }
 
     public void union(T a, T b) {
