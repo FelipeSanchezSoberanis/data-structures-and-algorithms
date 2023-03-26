@@ -37,7 +37,6 @@ public class ConnectingPoints {
         edges.sort((a, b) -> a.getDistance() > b.getDistance() ? 1 : -1);
 
         LOGGER.infoFormat("Number of edges: %s", edges.size());
-        LOGGER.infoFormat("Edges: %s", edges.toString());
 
         double result = 0.0;
 
@@ -59,7 +58,10 @@ public class ConnectingPoints {
         DataReader dataReader = new DataReader();
         dataReader.readData();
 
-        System.out.format("%.9f", minimumDistance(dataReader.getX(), dataReader.getY()));
+        double result = minimumDistance(dataReader.getX(), dataReader.getY());
+        System.out.format("%.9f", result);
+
+        LOGGER.infoFormat("Result: %s", result);
     }
 }
 
